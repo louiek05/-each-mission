@@ -3,14 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>旅行者 - 勇者之證</title>
+    <title>旅人 - 勇者之證</title>
     <link href="https://fonts.googleapis.com/css2?family=ZCOOL+XiaoWei&family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
     <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-firestore-compat.js"></script>
-    <!-- Firebase 配置文件 -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
     <script src="firebase-config.js"></script>
+    <script>
+        // 從 URL 獲取用戶 ID
+        function getUserIdFromUrl() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('id');
+        }
+
+        // 讀取用戶資料
+        async function loadUserData() {
+            const userId = getUserIdFromUrl();
+            if (!userId) {
+                alert('無法獲取用戶ID，請重新進入頁面');
+                return;
+            }
+
+            try {
+                const userRef = firebase.firestore().collection('users').doc(userId);
+                const doc = await userRef.get();
+                
+                if (doc.exists) {
+                    const userData = doc.data();
+                    // 更新頁面內容
+                    document.getElementById('nickname').textContent = userData.nickname || '未設置';
+                    document.getElementById('personality').textContent = userData.personality || '未設置';
+                    document.getElementById('abilities').textContent = userData.abilities || '未設置';
+                    document.getElementById('description').textContent = userData.description || '未設置';
+                } else {
+                    alert('找不到用戶資料');
+                }
+            } catch (error) {
+                console.error('Error loading user data:', error);
+                alert('載入資料時發生錯誤');
+            }
+        }
+
+        // 頁面載入時執行
+        window.addEventListener('load', loadUserData);
+
+        // 使用 db 和 auth
+        const user = firebase.auth().currentUser;
+        if (user) {
+            firebase.firestore().collection('users').doc(user.uid).get().then((doc) => {
+                if (doc.exists) {
+                    const userData = doc.data();
+                    // 顯示用戶資料
+                    document.getElementById('nickname').textContent = userData.nickname || '未設置';
+                    document.getElementById('personality').textContent = userData.personality || '未設置';
+                    document.getElementById('abilities').textContent = userData.abilities || '未設置';
+                    document.getElementById('description').textContent = userData.description || '未設置';
+                }
+            });
+        }
+    </script>
     <style>
         body {
             display: flex;
@@ -384,23 +436,20 @@
         <div class="card-corner corner-bottom-left"></div>
         <div class="card-corner corner-bottom-right"></div>
         <div class="card-content">
-            <h1 class="card-title">旅行者</h1>
+            <h1 class="card-title">旅人</h1>
             <div class="avatar"></div>
             <div class="nickname-container">
-                <div class="nickname" id="nickname">載入中...</div>
+                <div class="nickname" id="nickname"></div>
             </div>
             <div class="attributes">
                 <div class="attribute">
-                    <strong>性格特質：</strong>
-                    <div class="attribute-content" id="personality">載入中...</div>
+                    <strong>性格特質：</strong><div class="attribute-content" id="personality"></div>
                 </div>
                 <div class="attribute">
-                    <strong>核心能力：</strong>
-                    <div class="attribute-content" id="abilities">載入中...</div>
+                    <strong>核心能力：</strong><div class="attribute-content" id="abilities"></div>
                 </div>
                 <div class="attribute">
-                    <strong>個人描述：</strong>
-                    <div class="attribute-content" id="description">載入中...</div>
+                    <strong>職業描述：</strong><div class="attribute-content" id="description"></div>
                 </div>
             </div>
             <p class="motto">
@@ -408,38 +457,5 @@
             </p>
         </div>
     </div>
-
-    <script>
-        const db = firebase.firestore();
-        const auth = firebase.auth();
-
-        // 檢查用戶是否已登入
-        auth.onAuthStateChanged(function(user) {
-            if (user) {
-                // 用戶已登入，獲取用戶資料
-                db.collection('users').doc(user.uid).get()
-                    .then(doc => {
-                        if (doc.exists && doc.data().class === 'traveler') {
-                            const userData = doc.data();
-                            // 更新頁面內容
-                            document.getElementById('nickname').textContent = userData.nickname;
-                            document.getElementById('personality').textContent = userData.personality;
-                            document.getElementById('abilities').textContent = userData.abilities;
-                            document.getElementById('description').textContent = userData.description;
-                        } else {
-                            // 如果用戶不是旅行者，跳轉到註冊頁面
-                            window.location.href = 'register.html';
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error getting user data:', error);
-                        window.location.href = 'register.html';
-                    });
-            } else {
-                // 用戶未登入，跳轉到註冊頁面
-                window.location.href = 'register.html';
-            }
-        });
-    </script>
 </body>
 </html> 
