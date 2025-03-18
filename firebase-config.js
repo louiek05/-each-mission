@@ -1,12 +1,11 @@
 // Firebase 配置
 const firebaseConfig = {
-  apiKey: "AIzaSyDxGxGxGxGxGxGxGxGxGxGxGxGxGxGxGxGx",
-  authDomain: "your-project.firebaseapp.com",
-  projectId: "your-project",
-  storageBucket: "your-project.appspot.com",
-  messagingSenderId: "your-messaging-sender-id",
-  appId: "your-app-id",
-  measurementId: "5k4g4g86"
+  apiKey: "AIzaSyAkCEHAwG2pbPGbRXVPutzXD43FcmAG-7I",
+  authDomain: "adventure-card-project.firebaseapp.com",
+  projectId: "adventure-card-project",
+  storageBucket: "adventure-card-project.appspot.com",
+  messagingSenderId: "850675878938",
+  appId: "1:850675878938:web:2436d974f2d0513e6ed5a3"
 };
 
 // 初始化 Firebase
