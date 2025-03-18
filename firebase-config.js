@@ -19,6 +19,3 @@ const db = firebase.firestore();
 
 // 初始化 Auth
 const auth = firebase.auth();
-
-// 導出 Firebase 實例
-export { firebase, db, auth }; 
