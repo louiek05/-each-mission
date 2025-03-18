@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>工匠卡片</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+            font-family: "Microsoft JhengHei", sans-serif;
+        }
+
+        .adventure-card {
+            width: 300px;
+            height: 400px;
+            background-color: #6e4c1e;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-content {
+            position: relative;
+            z-index: 1;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: #f5e6d3;
+        }
+
+        .card-title {
+            font-size: 24px;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .card-description {
+            font-size: 16px;
+            line-height: 1.6;
+            margin: 0 20px;
+        }
+
+        .card-border {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            bottom: 10px;
+            border: 2px solid #f5e6d3;
+            border-radius: 8px;
+            pointer-events: none;
+        }
+
+        .card-corner {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #f5e6d3;
+        }
+
+        .corner-top-left {
+            top: 15px;
+            left: 15px;
+            border-right: none;
+            border-bottom: none;
+        }
+
+        .corner-top-right {
+            top: 15px;
+            right: 15px;
+            border-left: none;
+            border-bottom: none;
+        }
+
+        .corner-bottom-left {
+            bottom: 15px;
+            left: 15px;
+            border-right: none;
+            border-top: none;
+        }
+
+        .corner-bottom-right {
+            bottom: 15px;
+            right: 15px;
+            border-left: none;
+            border-top: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="adventure-card">
+        <div class="card-border"></div>
+        <div class="card-corner corner-top-left"></div>
+        <div class="card-corner corner-top-right"></div>
+        <div class="card-corner corner-bottom-left"></div>
+        <div class="card-corner corner-bottom-right"></div>
+        <div class="card-content">
+            <h1 class="card-title">工匠</h1>
+            <p class="card-description">
+                創造力、堅持<br>
+                鍛造、細心<br>
+                精湛的工藝技術<br>
+                用雙手打造夢想的形狀
+            </p>
+        </div>
+    </div>
+</body>
+</html> 

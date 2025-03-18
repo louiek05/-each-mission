@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>勇者卡片</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background: 
+                linear-gradient(135deg, #2c1810 0%, #1a0f0a 100%),
+                url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23ffffff' fill-opacity='0.05' fill-rule='evenodd'/%3E%3C/svg%3E");
+            background-size: 100px 100px;
+            background-position: 0 0;
+            font-family: "Microsoft JhengHei", sans-serif;
+            position: relative;
+            overflow: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 20%, rgba(218, 165, 32, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(218, 165, 32, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .adventure-card {
+            width: 600px;
+            height: 350px;
+            background: linear-gradient(135deg, #8b4513 0%, #7b3410 50%, #642100 100%);
+            padding: 25px;
+            box-shadow: 
+                0 10px 20px rgba(0,0,0,0.2),
+                0 0 0 1px rgba(255,255,255,0.1) inset;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transform: perspective(1000px) rotateX(2deg);
+            border-radius: 30px;
+        }
+
+        .adventure-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23ffffff' fill-opacity='0.05' fill-rule='evenodd'/%3E%3C/svg%3E"),
+                linear-gradient(45deg, rgba(0,0,0,0.15) 25%, transparent 25%),
+                linear-gradient(-45deg, rgba(0,0,0,0.15) 25%, transparent 25%),
+                linear-gradient(45deg, transparent 75%, rgba(0,0,0,0.15) 75%),
+                linear-gradient(-45deg, transparent 75%, rgba(0,0,0,0.15) 75%),
+                radial-gradient(circle at 30% 30%, rgba(0,0,0,0.1) 0%, transparent 50%),
+                radial-gradient(circle at 70% 70%, rgba(0,0,0,0.1) 0%, transparent 50%);
+            background-size: 100px 100px, 20px 20px, 20px 20px, 20px 20px, 20px 20px, 20px 20px;
+            background-position: 0 0, 0 0, 0 10px, 10px -10px, -10px 0px, 0 0;
+            opacity: 0.2;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        /* 金屬質感邊框 */
+        .card-border::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border: 8px ridge;
+            border-image: linear-gradient(45deg, #b8860b, #daa520, #ffd700, #daa520, #b8860b) 1;
+            border-radius: 25px;
+            pointer-events: none;
+            box-shadow: 
+                inset 0 0 15px rgba(218, 165, 32, 0.3),
+                0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        /* 磨損效果 */
+        .card-border::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: 25px;
+            background: 
+                radial-gradient(circle at 20% 20%, rgba(255,255,255,0.2) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(255,255,255,0.2) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(0,0,0,0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        /* 移除魔法陣相關的CSS */
+        .magic-circle,
+        .magic-circle::before,
+        .magic-circle::after,
+        .magic-circle.top-left,
+        .magic-circle.top-right,
+        .magic-circle.bottom-left,
+        .magic-circle.bottom-right {
+            display: none;
+        }
+
+        /* 武器裝飾 */
+        .weapon-decoration {
+            position: absolute;
+            color: #f5e6d3;
+            font-size: 28px;
+            opacity: 0.5;
+            pointer-events: none;
+            text-shadow: 0 0 10px rgba(218, 165, 32, 0.5);
+        }
+
+        .weapon-decoration.top-left {
+            top: 15px;
+            left: 15px;
+            transform: rotate(-45deg);
+        }
+
+        .weapon-decoration.top-right {
+            top: 15px;
+            right: 15px;
+            transform: rotate(45deg);
+        }
+
+        .weapon-decoration.bottom-left {
+            bottom: 15px;
+            left: 15px;
+            transform: rotate(-135deg);
+        }
+
+        .weapon-decoration.bottom-right {
+            bottom: 15px;
+            right: 15px;
+            transform: rotate(135deg);
+        }
+
+        /* 頭像裝飾性邊框 */
+        .card-avatar {
+            width: 220px;
+            height: 220px;
+            background: linear-gradient(to right, #f5f5dc, #faf0e6);
+            border: 6px ridge;
+            border-image: linear-gradient(45deg, #b8860b, #daa520, #ffd700, #daa520, #b8860b) 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 64px;
+            color: #2c1810;
+            position: relative;
+            box-shadow: 
+                0 4px 8px rgba(0,0,0,0.1),
+                inset 0 2px 4px rgba(255,255,255,0.2);
+            border-radius: 20px;
+            margin: 8px 0;
+            flex-shrink: 0;
+            transition: transform 0.2s ease;
+            align-self: center;
+        }
+
+        .card-avatar::before {
+            content: '';
+            position: absolute;
+            top: -5px;
+            left: -5px;
+            right: -5px;
+            bottom: -5px;
+            border: 2px solid rgba(218, 165, 32, 0.3);
+            border-radius: 20px;
+            pointer-events: none;
+        }
+
+        .card-avatar::after {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            right: -10px;
+            bottom: -10px;
+            border: 1px solid rgba(218, 165, 32, 0.2);
+            border-radius: 25px;
+            pointer-events: none;
+        }
+
+        .card-header {
+            text-align: center;
+            margin-bottom: 15px;
+            position: relative;
+            padding: 15px 25px;
+            background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.05), transparent);
+        }
+
+        .header-divider {
+            width: 80%;
+            height: 8px;
+            margin: 0 auto 15px;
+            border: 4px ridge;
+            border-image: linear-gradient(45deg, #b8860b, #daa520, #ffd700, #daa520, #b8860b) 1;
+            box-shadow: 
+                inset 0 0 15px rgba(218, 165, 32, 0.3),
+                0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .card-title {
+            font-size: 32px;
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            position: relative;
+            display: inline-block;
+            font-family: "Microsoft JhengHei", sans-serif;
+            font-weight: bold;
+            text-shadow: 
+                2px 2px 4px rgba(0,0,0,0.2),
+                0 0 15px rgba(218, 165, 32, 0.3);
+            background: linear-gradient(45deg, #f5e6d3, #d4c4b3);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            padding: 0 20px;
+            filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.5));
+        }
+
+        .card-title::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
+            height: 2px;
+            background: linear-gradient(to right, transparent, #b8860b, transparent);
+            box-shadow: 0 0 10px rgba(218, 165, 32, 0.3);
+        }
+
+        .card-title::before,
+        .card-title::after {
+            content: "⚔";
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #b8860b;
+            font-size: 28px;
+            opacity: 0.5;
+            text-shadow: 0 0 10px rgba(218, 165, 32, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        .card-title:hover::before,
+        .card-title:hover::after {
+            opacity: 0.8;
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .card-title::before {
+            left: -45px;
+        }
+
+        .card-title::after {
+            right: -45px;
+        }
+
+        .card-content {
+            display: flex;
+            flex: 1;
+            gap: 40px;
+            position: relative;
+            z-index: 1;
+            padding: 0 15px;
+            justify-content: center;
+            margin-top: -20px;
+            filter: sepia(0.2) contrast(0.9) brightness(0.95);
+        }
+
+        .card-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding: 8px 0;
+            margin: 0;
+            width: 100%;
+            max-width: 260px;
+            align-items: center;
+        }
+
+        .info-item {
+            background: linear-gradient(to right, #f5f5dc, #faf0e6);
+            padding: 8px 15px;
+            border: 4px ridge;
+            border-image: linear-gradient(45deg, #b8860b, #daa520, #ffd700, #daa520, #b8860b) 1;
+            position: relative;
+            box-shadow: 
+                0 2px 4px rgba(0,0,0,0.05),
+                inset 0 1px 2px rgba(255,255,255,0.1);
+            border-radius: 10px;
+            transition: transform 0.2s ease;
+            text-align: left;
+            width: 100%;
+            max-width: 240px;
+        }
+
+        .info-item:last-child {
+            margin-top: 0;
+        }
+
+        .info-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 
+                0 4px 8px rgba(0,0,0,0.1),
+                inset 0 1px 2px rgba(255,255,255,0.1),
+                0 0 10px rgba(139, 69, 19, 0.3);
+        }
+
+        .info-item::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            border: 1px solid rgba(218, 165, 32, 0.3);
+            border-radius: 12px;
+            pointer-events: none;
+        }
+
+        .info-item::after {
+            content: '';
+            position: absolute;
+            top: -4px;
+            left: -4px;
+            right: -4px;
+            bottom: -4px;
+            border: 1px solid rgba(218, 165, 32, 0.2);
+            border-radius: 14px;
+            pointer-events: none;
+        }
+
+        .info-label {
+            font-size: 14px;
+            color: #2c1810;
+            opacity: 0.7;
+            margin-bottom: 5px;
+            font-family: "Times New Roman", serif;
+            font-style: italic;
+            text-align: left;
+        }
+
+        .info-value {
+            font-size: 16px;
+            color: #2c1810;
+            line-height: 1.3;
+            font-family: "Microsoft JhengHei", sans-serif;
+            font-weight: bold;
+            text-align: left;
+        }
+
+        /* 移除角落裝飾相關的CSS */
+        .corner,
+        .corner-top-left,
+        .corner-top-right,
+        .corner-bottom-left,
+        .corner-bottom-right {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="adventure-card">
+        <div class="card-border">
+            <div class="weapon-decoration top-left">⚔</div>
+            <div class="weapon-decoration top-right">⚔</div>
+            <div class="weapon-decoration bottom-left">⚔</div>
+            <div class="weapon-decoration bottom-right">⚔</div>
+        </div>
+        
+        <div class="card-header">
+            <h1 class="card-title">勇者之證</h1>
+        </div>
+        <div class="card-content">
+            <div class="card-info">
+                <div class="info-item">
+                    <div class="info-label">暱稱</div>
+                    <div class="info-value">勇者</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">興趣</div>
+                    <div class="info-value">冒險、探索、收集寶物</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">職業描述</div>
+                    <div class="info-value">一位充滿勇氣的冒險者，擅長探索未知領域，擁有堅定的信念與正義感。</div>
+                </div>
+            </div>
+            
+            <div class="card-avatar">
+                👤
+            </div>
+        </div>
+    </div>
+</body>
+</html> 
