@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>測驗結果 - 勇者之證</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: radial-gradient(circle at center,
+                #FAEBD7 0%,
+                #A0522D 70%,
+                #8B4513 100%
+            );
+            font-family: 'Noto Serif TC', serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .container {
+            width: 80%;
+            max-width: 800px;
+            background: rgba(139, 69, 19, 0.9);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+            position: relative;
+            z-index: 1;
+            max-height: 80vh;
+            overflow-y: auto;
+            text-align: center;
+            border: 3px solid #DEB887;
+        }
+
+        h1 {
+            color: #FFD700;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .class-option {
+            background: rgba(139, 69, 19, 0.8);
+            border: 2px solid #DEB887;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .class-option:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            background: rgba(139, 69, 19, 1);
+        }
+
+        .class-option h3 {
+            color: #FFD700;
+            margin: 0 0 10px 0;
+            font-size: 1.5em;
+        }
+
+        .class-option p {
+            color: #FFE4B5;
+            margin: 0;
+            font-size: 1.1em;
+            line-height: 1.6;
+        }
+
+        .btn {
+            background: #FAEBD7;
+            color: #8B4513;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 1.2em;
+            margin: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Noto Serif TC', serif;
+            font-weight: 600;
+            border: 2px solid #DEB887;
+            width: 100%;
+            max-width: 300px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(250, 235, 215, 0.4);
+            background: #FFE4B5;
+        }
+
+        .selected-traits {
+            color: #FFE4B5;
+            margin: 20px 0;
+            font-size: 1.1em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>測驗結果</h1>
+        <div class="selected-traits" id="selectedTraits"></div>
+        <div id="resultContent"></div>
+    </div>
+
+    <script>
+        // 職業名稱映射
+        const classNames = {
+            warrior: "鬥士",
+            assassin: "刺客",
+            mage: "法師",
+            craftsman: "工匠",
+            traveler: "旅人"
+        };
+
+        // 職業描述
+        const classDescriptions = {
+            warrior: "勇敢的守望者，在困難面前，信念就是最亮的光。",
+            assassin: "冷靜和精準，在暗夜裡，劃過最優美的弧線。",
+            mage: "古老的咒語，魔幻又誘人的未知，彷彿一切的解答。",
+            craftsman: "理想的雕刻者，完美不是偶然，而是至高無上的敬意。",
+            traveler: "那無盡的渴望，將自身化為，容納全世界驚奇的寶藏盒。"
+        };
+
+        // 職業特質數據
+        const traits = {
+            warrior: [
+                "勇敢", "好勝", "善良", "勇往直前", "同理心", "愛冒險",
+                "熱情", "誠實", "一拳解決", "保護慾"
+            ],
+            assassin: [
+                "專業", "高洞察力", "獨來獨往", "專注忍耐", "冷靜", "果斷",
+                "快速反應", "情報能力", "暗殺"
+            ],
+            mage: [
+                "最高戰力", "自信", "智慧", "精神力", "責任感", "合作能力", "會魔法",
+                "有遠見", "理性", "善於理解"
+            ],
+            craftsman: [
+                "創造力", "毅力", "耐心", "實驗精神", "美的追求", "渴望知識", "節儉",
+                "鍛造", "細心", "堅持完美"
+            ],
+            traveler: [
+                "自由自在", "喜歡旅遊", "慵懶", "開放心態", "渴望刺激", "愛自然",
+                "獨立性", "跳脫框架", "感性", "野外求生"
+            ]
+        };
+
+        function calculateMatches(selectedTraits) {
+            const scores = {};
+            
+            // 計算每個職業的匹配分數
+            Object.entries(traits).forEach(([className, classTraits]) => {
+                scores[className] = selectedTraits.filter(trait => 
+                    classTraits.includes(trait)
+                ).length;
+            });
+
+            // 找出最高分數
+            const maxScore = Math.max(...Object.values(scores));
+            
+            // 返回所有達到最高分數的職業
+            return Object.entries(scores)
+                .filter(([_, score]) => score === maxScore)
+                .map(([className]) => className);
+        }
+
+        function showResult() {
+            // 從 sessionStorage 獲取選擇的特質
+            const selectedTraits = JSON.parse(sessionStorage.getItem('selectedTraits') || '[]');
+            
+            // 顯示選擇的特質
+            document.getElementById('selectedTraits').textContent = 
+                `你選擇的特質：${selectedTraits.join('、')}`;
+            
+            // 計算匹配的職業
+            const matches = calculateMatches(selectedTraits);
+            
+            // 顯示結果
+            const resultContent = document.getElementById('resultContent');
+            let resultHTML = '';
+            
+            if (matches.length === 1) {
+                resultHTML = `
+                    <p>根據你的選擇，最適合你的職業是：</p>
+                    <div class="class-option" onclick="selectClass('${matches[0]}')">
+                        <h3>${classNames[matches[0]]}</h3>
+                        <p>${classDescriptions[matches[0]]}</p>
+                    </div>
+                `;
+            } else {
+                resultHTML = `
+                    <p>根據你的選擇，你可以選擇以下職業：</p>
+                    ${matches.map(className => `
+                        <div class="class-option" onclick="selectClass('${className}')">
+                            <h3>${classNames[className]}</h3>
+                            <p>${classDescriptions[className]}</p>
+                        </div>
+                    `).join('')}
+                `;
+            }
+            
+            resultContent.innerHTML = resultHTML;
+        }
+
+        function selectClass(className) {
+            sessionStorage.setItem('selectedClass', className);
+            window.location.href = 'register.html';
+        }
+
+        // 頁面加載時顯示結果
+        window.onload = showResult;
+    </script>
+</body>
+</html> 

@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>戰士 - 勇者之證</title>
+    <link href="https://fonts.googleapis.com/css2?family=ZCOOL+XiaoWei&family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-firestore-compat.js"></script>
+    <!-- Firebase 配置文件 -->
+    <script src="firebase-config.js"></script>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background: radial-gradient(circle at center, 
+                #FFE4E1 0%,
+                #FFB6C1 20%,
+                #CD5C5C 40%,
+                #B22222 60%,
+                #8B0000 100%
+            );
+            font-family: 'Noto Sans TC', "Microsoft JhengHei", sans-serif;
+            position: relative;
+            overflow: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                radial-gradient(circle at 0 0, rgba(0, 0, 0, 0.3), transparent 30%),
+                radial-gradient(circle at 100% 0, rgba(0, 0, 0, 0.3), transparent 30%),
+                radial-gradient(circle at 0 100%, rgba(0, 0, 0, 0.3), transparent 30%),
+                radial-gradient(circle at 100% 100%, rgba(0, 0, 0, 0.3), transparent 30%),
+                linear-gradient(90deg, rgba(178, 34, 34, 0.07) 50%, transparent 50%),
+                linear-gradient(rgba(178, 34, 34, 0.13) 50%, transparent 50%);
+            background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%, 37px 37px, 37px 37px;
+            animation: paper-texture 3s infinite linear;
+            opacity: 0.3;
+            pointer-events: none;
+        }
+
+        @keyframes paper-texture {
+            from {
+                background-position: 0 0;
+            }
+            to {
+                background-position: 37px 37px;
+            }
+        }
+
+        .adventure-card {
+            width: 350px;
+            height: 550px;
+            background: linear-gradient(45deg, #8B0000, #B22222);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5),
+                       inset 0 0 50px rgba(139, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+            border: 2px solid #C0C0C0;
+        }
+
+        .card-content {
+            position: relative;
+            z-index: 1;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #FFE4E1;
+            padding-top: 5px;
+        }
+
+        .card-title {
+            font-family: 'ZCOOL XiaoWei', serif;
+            font-size: 24px;
+            margin-bottom: 15px;
+            margin-top: 5px;
+            letter-spacing: 5px;
+            color: #FFE4E1;
+            text-shadow: 
+                2px 2px 4px rgba(0,0,0,0.5),
+                -1px -1px 1px rgba(255,255,255,0.3);
+            font-weight: bold;
+            padding: 5px 50px;
+            position: relative;
+            background: linear-gradient(90deg, 
+                rgba(255, 228, 225, 0.05) 0%,
+                rgba(255, 228, 225, 0.2) 50%,
+                rgba(255, 228, 225, 0.05) 100%
+            );
+            border-radius: 10px;
+            border-top: 2px solid rgba(255, 228, 225, 0.7);
+            border-bottom: 2px solid rgba(255, 228, 225, 0.7);
+        }
+
+        .avatar {
+            width: 140px;
+            height: 250px;
+            border-radius: 20px;
+            background-color: #FFE4E1;
+            margin: 10px 0;
+            border: 4px solid #C0C0C0;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3),
+                       inset 0 0 15px rgba(0, 0, 0, 0.2);
+            background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="%238B0000" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>');
+            background-size: 80%;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .avatar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, 
+                transparent 0%,
+                rgba(255, 255, 255, 0.05) 45%,
+                rgba(255, 255, 255, 0.1) 50%,
+                rgba(255, 255, 255, 0.05) 55%,
+                transparent 100%
+            );
+            border-radius: 20px;
+            pointer-events: none;
+        }
+
+        .nickname-container {
+            background: transparent;
+            padding: 8px 20px;
+            border-radius: 20px;
+            margin-top: 10px;
+            margin-bottom: 8px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.3),
+                       inset 0 0 10px rgba(0, 0, 0, 0.2);
+            border: 4px solid #C0C0C0;
+        }
+
+        .nickname-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, 
+                transparent 0%,
+                rgba(255, 255, 255, 0.05) 45%,
+                rgba(255, 255, 255, 0.1) 50%,
+                rgba(255, 255, 255, 0.05) 55%,
+                transparent 100%
+            );
+            border-radius: 20px;
+            pointer-events: none;
+        }
+
+        .nickname {
+            font-family: 'ZCOOL XiaoWei', serif;
+            font-size: 22px;
+            color: #C0C0C0;
+            text-shadow: 
+                2px 2px 4px rgba(0,0,0,0.4),
+                -1px -1px 1px rgba(255,255,255,0.2);
+            background: linear-gradient(to bottom, #E8E8E8, #C0C0C0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+
+        .attributes {
+            width: calc(100% - 20px);
+            margin-top: 5px;
+            padding: 15px;
+            background: transparent;
+            border-radius: 15px;
+            border: 4px solid #C0C0C0;
+            box-shadow: 
+                inset 0 0 15px rgba(0, 0, 0, 0.3),
+                0 0 20px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            min-height: 120px;
+            padding-top: 12px;
+            gap: 5px;
+        }
+
+        .attributes::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, 
+                transparent 0%,
+                rgba(255, 255, 255, 0.05) 45%,
+                rgba(255, 255, 255, 0.1) 50%,
+                rgba(255, 255, 255, 0.05) 55%,
+                transparent 100%
+            );
+            border-radius: 15px;
+            pointer-events: none;
+        }
+
+        .attribute {
+            text-align: left;
+            padding-left: 10px;
+            padding-right: 10px;
+            display: flex;
+            flex-direction: row;
+            align-items: flex-start;
+            position: relative;
+            margin: 0;
+        }
+
+        .attribute strong {
+            font-family: 'ZCOOL XiaoWei', serif;
+            color: #FFE4E1;
+            text-shadow: 
+                1px 1px 2px rgba(0,0,0,0.5),
+                -1px -1px 1px rgba(255,255,255,0.2);
+            white-space: nowrap;
+            font-size: 18px;
+            letter-spacing: 1px;
+            flex-shrink: 0;
+            width: 100px;
+            padding-top: 5px;
+        }
+
+        .attribute-content {
+            font-family: 'ZCOOL XiaoWei', serif;
+            font-size: 16px;
+            letter-spacing: 1px;
+            line-height: 1.6;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+            color: #FFE4E1;
+            margin-left: 5px;
+            padding-top: 5px;
+        }
+
+        .motto {
+            font-family: 'ZCOOL XiaoWei', serif;
+            font-style: italic;
+            color: #FFE4E1;
+            margin-top: 20px;
+            text-align: center;
+            font-size: 16px;
+            text-shadow: 
+                2px 2px 4px rgba(0,0,0,0.4),
+                -1px -1px 1px rgba(255,255,255,0.2);
+            letter-spacing: 1px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            background: #8B0000;
+            color: #FFE4E1;
+            border: 1px solid #CD5C5C;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'ZCOOL XiaoWei', serif;
+            font-size: 18px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            width: 120px;
+            text-align: center;
+        }
+
+        .btn:hover {
+            background: #B22222;
+            border-color: #DC143C;
+            transform: translateX(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+
+        .button-container {
+            position: fixed;
+            top: 50%;
+            right: 20px;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            z-index: 1000;
+        }
+
+        .edit-btn {
+            background: #8B0000;
+        }
+
+        .accept-btn {
+            background: #A52A2A;
+        }
+
+        .create-btn {
+            background: #B22222;
+        }
+
+        .card-border {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            bottom: 10px;
+            border: 3px solid #C0C0C0;
+            border-radius: 15px;
+            pointer-events: none;
+            box-shadow: 
+                0 0 20px rgba(0, 0, 0, 0.3),
+                inset 0 0 10px rgba(0, 0, 0, 0.2);
+            background: transparent;
+        }
+
+        .card-border::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, 
+                transparent 0%,
+                rgba(255, 255, 255, 0.05) 45%,
+                rgba(255, 255, 255, 0.1) 50%,
+                rgba(255, 255, 255, 0.05) 55%,
+                transparent 100%
+            );
+            border-radius: 15px;
+            pointer-events: none;
+        }
+
+        .card-corner {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            color: #FFE4E1;
+            text-shadow: 0 0 3px rgba(205, 92, 92, 0.8);
+        }
+
+        .card-corner::before {
+            content: '✦';
+        }
+
+        .corner-top-left {
+            top: 5px;
+            left: 5px;
+            transform: rotate(-45deg);
+        }
+
+        .corner-top-right {
+            top: 5px;
+            right: 5px;
+            transform: rotate(45deg);
+        }
+
+        .corner-bottom-left {
+            bottom: 5px;
+            left: 5px;
+            transform: rotate(-135deg);
+        }
+
+        .corner-bottom-right {
+            bottom: 5px;
+            right: 5px;
+            transform: rotate(135deg);
+        }
+    </style>
+</head>
+<body>
+    <div class="button-container">
+        <button class="btn edit-btn" onclick="window.location.href='edit.html?id=' + getUserIdFromUrl()">修改介面</button>
+        <button class="btn accept-btn" onclick="window.location.href='tasks.html?type=accept&id=' + getUserIdFromUrl()">接任務</button>
+        <button class="btn create-btn" onclick="window.location.href='tasks.html?type=create&id=' + getUserIdFromUrl()">發任務</button>
+    </div>
+    <div class="adventure-card">
+        <div class="card-border"></div>
+        <div class="card-corner corner-top-left"></div>
+        <div class="card-corner corner-top-right"></div>
+        <div class="card-corner corner-bottom-left"></div>
+        <div class="card-corner corner-bottom-right"></div>
+        <div class="card-content">
+            <h1 class="card-title">戰士</h1>
+            <div class="avatar"></div>
+            <div class="nickname-container">
+                <div class="nickname" id="nickname">載入中...</div>
+            </div>
+            <div class="attributes">
+                <div class="attribute">
+                    <strong>性格特質：</strong>
+                    <div class="attribute-content" id="personality">載入中...</div>
+                </div>
+                <div class="attribute">
+                    <strong>核心能力：</strong>
+                    <div class="attribute-content" id="abilities">載入中...</div>
+                </div>
+                <div class="attribute">
+                    <strong>個人描述：</strong>
+                    <div class="attribute-content" id="description">載入中...</div>
+                </div>
+            </div>
+            <p class="motto">
+                "劍與盾的守護者，戰場上的不敗勇士"
+            </p>
+        </div>
+    </div>
+
+    <script>
+        const db = firebase.firestore();
+        const auth = firebase.auth();
+
+        // 檢查用戶是否已登入
+        auth.onAuthStateChanged(function(user) {
+            if (user) {
+                // 用戶已登入，獲取用戶資料
+                db.collection('users').doc(user.uid).get()
+                    .then(doc => {
+                        if (doc.exists && doc.data().class === 'warrior') {
+                            const userData = doc.data();
+                            // 更新頁面內容
+                            document.getElementById('nickname').textContent = userData.nickname;
+                            document.getElementById('personality').textContent = userData.personality;
+                            document.getElementById('abilities').textContent = userData.abilities;
+                            document.getElementById('description').textContent = userData.description;
+                        } else {
+                            // 如果用戶不是戰士，跳轉到註冊頁面
+                            window.location.href = 'register.html';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error getting user data:', error);
+                        window.location.href = 'register.html';
+                    });
+            } else {
+                // 用戶未登入，跳轉到註冊頁面
+                window.location.href = 'register.html';
+            }
+        });
+    </script>
+</body>
+</html> 

@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>勇者之證 - 首頁</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: radial-gradient(circle at center,
+                #FAEBD7 0%,
+                #A0522D 70%,
+                #8B4513 100%
+            );
+            font-family: 'Noto Serif TC', serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .container {
+            width: 80%;
+            max-width: 800px;
+            background: rgba(139, 69, 19, 0.9);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+            position: relative;
+            z-index: 1;
+            max-height: 80vh;
+            overflow-y: auto;
+            text-align: center;
+            border: 3px solid #DEB887;
+        }
+
+        h1 {
+            color: #FFD700;
+            margin-bottom: 20px;
+            font-size: 3em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .subtitle {
+            color: #FFE4B5;
+            font-size: 1.5em;
+            margin-bottom: 25px;
+            line-height: 1.4;
+        }
+
+        .description {
+            color: #FFE4B5;
+            font-size: 1.2em;
+            line-height: 1.6;
+            margin-bottom: 30px;
+            text-align: center;
+            padding: 0 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .description p {
+            margin: 0;
+            max-width: 600px;
+            padding: 0 20px;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .btn {
+            background: #FAEBD7;
+            color: #8B4513;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 1.2em;
+            margin: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Noto Serif TC', serif;
+            font-weight: 600;
+            border: 2px solid #DEB887;
+            width: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(250, 235, 215, 0.4);
+            background: #FFE4B5;
+        }
+
+        .btn:disabled {
+            background: #E8E8E8;
+            color: #999;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .button-container {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .button-container .btn {
+            width: auto;
+            min-width: 200px;
+        }
+
+        .class-preview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 40px;
+            padding: 20px;
+        }
+
+        .class-card {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            padding: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .class-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .class-name {
+            color: #FFD700;
+            font-size: 1.2em;
+            margin-bottom: 10px;
+        }
+
+        .class-traits {
+            color: #FFE4B5;
+            font-size: 0.9em;
+            line-height: 1.4;
+        }
+
+        .login-link {
+            margin-top: 20px;
+            color: #FFE4B5;
+            font-size: 1.1em;
+        }
+
+        .login-link a {
+            color: #FFD700;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .login-link a:hover {
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>勇者之證</h1>
+        <div class="subtitle">踏上屬於你的冒險之旅</div>
+        <div class="description">
+            <p>如果你今天不知道要做什麼，或是你希望有人可以跟你一起做一些瘋狂地的事情，</p>
+            <p>你希望生活可以有一點不一樣的刺激，那我們就從這裡開始吧。</p>
+            <p>吃飯、聊天、露營甚至是一起創業，都可以從這邊開始，</p>
+            <p>讓我們用更特別的方式，與這個世界裡各式各樣的人互動吧！</p>
+        </div>
+        <div class="button-container">
+            <button class="btn register" onclick="window.location.href='quiz.html'">註冊</button>
+            <button class="btn login" onclick="window.location.href='login.html'">登入</button>
+        </div>
+    </div>
+</body>
+</html> 

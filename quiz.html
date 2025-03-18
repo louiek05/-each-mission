@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>職業測驗 - 勇者之證</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: radial-gradient(circle at center,
+                #FAEBD7 0%,
+                #A0522D 70%,
+                #8B4513 100%
+            );
+            font-family: 'Noto Serif TC', serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .container {
+            width: 80%;
+            max-width: 800px;
+            background: rgba(139, 69, 19, 0.9);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+            position: relative;
+            z-index: 1;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: #FFD700;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .description {
+            text-align: center;
+            color: #FFE4B5;
+            margin-bottom: 30px;
+            font-size: 1.2em;
+            line-height: 1.6;
+        }
+
+        .traits-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .traits-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+            padding: 0 20px;
+        }
+
+        .trait-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid #DEB887;
+            padding: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #FFE4B5;
+            font-size: 1.1em;
+            text-align: center;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .trait-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .trait-btn.selected {
+            background: #8B4513;
+            border-color: #FFD700;
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+        }
+
+        .selected-count {
+            text-align: center;
+            color: #FFD700;
+            font-size: 1.2em;
+            margin: 20px 0;
+        }
+
+        .result-container {
+            display: none;
+            text-align: center;
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            border: 2px solid #DEB887;
+        }
+
+        .class-option {
+            background: rgba(139, 69, 19, 0.8);
+            border: 2px solid #DEB887;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .class-option:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            background: rgba(139, 69, 19, 1);
+        }
+
+        .class-option h3 {
+            color: #FFD700;
+            margin: 0 0 10px 0;
+            font-size: 1.5em;
+        }
+
+        .class-option p {
+            color: #FFE4B5;
+            margin: 0;
+            font-size: 1.1em;
+            line-height: 1.6;
+        }
+
+        .result-container.show {
+            display: block;
+        }
+
+        .btn {
+            background: #FAEBD7;
+            color: #8B4513;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 1.2em;
+            margin: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Noto Serif TC', serif;
+            font-weight: 600;
+            border: 2px solid #DEB887;
+            width: 100%;
+            max-width: 300px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(250, 235, 215, 0.4);
+            background: #FFE4B5;
+        }
+
+        .btn:disabled {
+            background: #E8E8E8;
+            color: #999;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .class-selection {
+            display: none;
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        .class-btn {
+            background: rgba(139, 69, 19, 0.8);
+            border: 2px solid #DEB887;
+            padding: 15px 30px;
+            margin: 10px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #FFE4B5;
+            font-family: 'Noto Serif TC', serif;
+            font-size: 1.2em;
+            font-weight: 600;
+        }
+
+        .class-btn:hover {
+            background: rgba(139, 69, 19, 1);
+            transform: translateY(-2px);
+        }
+
+        .submit-container {
+            text-align: center;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>職業測驗 - 勇者之證</h1>
+        <div class="description">
+            請選擇最符合你的特質（最多選擇5個）
+        </div>
+        <div class="traits-grid" id="traitsGrid">
+            <!-- 特質按鈕會在這裡動態生成 -->
+        </div>
+        <div class="selected-count" id="selectedCount">
+            已選擇：0/5
+        </div>
+        <div class="submit-container">
+            <button class="btn" id="submitBtn" onclick="showResult()" disabled>送出選擇</button>
+        </div>
+        <div class="result-container" id="resultContainer">
+            <h2>測驗結果</h2>
+            <div id="resultContent"></div>
+            <button class="btn" onclick="proceedToRegister()">確認並繼續</button>
+        </div>
+    </div>
+
+    <script>
+        // 職業名稱映射
+        const classNames = {
+            warrior: "鬥士",
+            assassin: "刺客",
+            mage: "法師",
+            craftsman: "工匠",
+            traveler: "旅人"
+        };
+
+        // 職業描述
+        const classDescriptions = {
+            warrior: "勇敢的守望者，在困難面前，信念就是最亮的光。",
+            assassin: "冷靜和精準，在暗夜裡，劃過最優美的弧線。",
+            mage: "古老的咒語，魔幻又誘人的未知，彷彿一切的解答。",
+            craftsman: "理想的雕刻者，完美不是偶然，而是至高無上的敬意。",
+            traveler: "那無盡的渴望，將自身化為，容納全世界驚奇的寶藏盒。"
+        };
+
+        // 職業特質數據
+        const traits = {
+            warrior: [
+                "勇敢", "好勝", "善良", "勇往直前", "同理心", "愛冒險",
+                "熱情", "誠實", "一拳解決", "保護慾"
+            ],
+            assassin: [
+                "專業", "高洞察力", "獨來獨往", "專注忍耐", "冷靜", "果斷",
+                "快速反應", "情報能力", "暗殺"
+            ],
+            mage: [
+                "最高戰力", "自信", "智慧", "精神力", "責任感", "合作能力", "會魔法",
+                "有遠見", "理性", "善於理解"
+            ],
+            craftsman: [
+                "創造力", "毅力", "耐心", "實驗精神", "美的追求", "渴望知識", "節儉",
+                "鍛造", "細心", "堅持完美"
+            ],
+            traveler: [
+                "自由自在", "喜歡旅遊", "慵懶", "開放心態", "渴望刺激", "愛自然",
+                "獨立性", "跳脫框架", "感性", "野外求生"
+            ]
+        };
+
+        let selectedTraits = [];
+
+        function createTraitButtons() {
+            const grid = document.getElementById('traitsGrid');
+            const allTraits = [
+                ...traits.warrior,
+                ...traits.assassin,
+                ...traits.mage,
+                ...traits.craftsman,
+                ...traits.traveler
+            ];
+
+            allTraits.forEach(trait => {
+                const button = document.createElement('button');
+                button.className = 'trait-btn';
+                button.textContent = trait;
+                button.onclick = () => toggleTrait(trait, button);
+                grid.appendChild(button);
+            });
+        }
+
+        function toggleTrait(trait, button) {
+            if (selectedTraits.includes(trait)) {
+                selectedTraits = selectedTraits.filter(t => t !== trait);
+                button.classList.remove('selected');
+            } else if (selectedTraits.length < 5) {
+                selectedTraits.push(trait);
+                button.classList.add('selected');
+            }
+            updateSelectedCount();
+            updateSubmitButton();
+        }
+
+        function updateSelectedCount() {
+            document.getElementById('selectedCount').textContent = `已選擇：${selectedTraits.length}/5`;
+        }
+
+        function updateSubmitButton() {
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = selectedTraits.length === 0;
+        }
+
+        function calculateMatches(selectedTraits) {
+            const scores = {};
+            
+            // 計算每個職業的匹配分數
+            Object.entries(traits).forEach(([className, classTraits]) => {
+                scores[className] = selectedTraits.filter(trait => 
+                    classTraits.includes(trait)
+                ).length;
+            });
+
+            // 找出最高分數
+            const maxScore = Math.max(...Object.values(scores));
+            
+            // 返回所有達到最高分數的職業
+            return Object.entries(scores)
+                .filter(([_, score]) => score === maxScore)
+                .map(([className]) => className);
+        }
+
+        function showResult() {
+            // 將選擇的特質存儲到 sessionStorage
+            sessionStorage.setItem('selectedTraits', JSON.stringify(selectedTraits));
+            // 跳轉到結果頁面
+            window.location.href = 'result.html';
+        }
+
+        // 初始化
+        createTraitButtons();
+    </script>
+</body>
+</html> 

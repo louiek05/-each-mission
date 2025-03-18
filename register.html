@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>勇者之證 - 註冊</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: radial-gradient(circle at center,
+                #FAEBD7 0%,
+                #A0522D 70%,
+                #8B4513 100%
+            );
+            font-family: 'Noto Serif TC', serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .container {
+            width: 80%;
+            max-width: 800px;
+            background: rgba(139, 69, 19, 0.9);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+            position: relative;
+            z-index: 1;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: #FFD700;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .description {
+            text-align: center;
+            color: #FFE4B5;
+            margin-bottom: 30px;
+            font-size: 1.2em;
+            line-height: 1.6;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #FFE4B5;
+            font-size: 1.1em;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #DEB887;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #FFE4B5;
+            font-size: 1.1em;
+            font-family: 'Noto Serif TC', serif;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #FFD700;
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .btn {
+            background: #FAEBD7;
+            color: #8B4513;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 1.2em;
+            margin: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Noto Serif TC', serif;
+            font-weight: 600;
+            border: 2px solid #DEB887;
+            width: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(250, 235, 215, 0.4);
+            background: #FFE4B5;
+        }
+
+        .btn:disabled {
+            background: #E8E8E8;
+            color: #999;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .error-message {
+            color: #FF6B6B;
+            text-align: center;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .class-info {
+            text-align: center;
+            color: #FFD700;
+            font-size: 1.2em;
+            margin-bottom: 20px;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>勇者之證 - 註冊</h1>
+        <div id="classInfo" class="class-info"></div>
+        <div class="description">
+            請填寫以下資料完成註冊。<br>
+            這些資訊將成為你的勇者之證。
+        </div>
+        <form id="registerForm">
+            <div class="form-group">
+                <label for="nickname">暱稱</label>
+                <input type="text" id="nickname" required>
+            </div>
+            <div class="form-group">
+                <label for="email">電子郵件</label>
+                <input type="email" id="email" required>
+            </div>
+            <div class="form-group">
+                <label for="password">密碼</label>
+                <input type="password" id="password" required>
+            </div>
+            <div class="form-group">
+                <label for="personality">性格特質</label>
+                <textarea id="personality" rows="3" required placeholder="請描述您的性格特質..."></textarea>
+            </div>
+            <div class="form-group">
+                <label for="abilities">核心能力</label>
+                <textarea id="abilities" rows="3" required placeholder="請描述您的核心能力..."></textarea>
+            </div>
+            <div class="form-group">
+                <label for="description">個人描述</label>
+                <textarea id="description" rows="4" required placeholder="請描述您自己..."></textarea>
+            </div>
+            <button type="submit" class="btn">完成註冊</button>
+        </form>
+        <div id="errorMessage" class="error-message"></div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <script>
+        // 檢查是否從測驗頁面來
+        const selectedClass = sessionStorage.getItem('selectedClass');
+        if (!selectedClass) {
+            window.location.href = 'quiz.html';
+        }
+
+        // 職業名稱映射
+        const classNames = {
+            warrior: "鬥士",
+            assassin: "刺客",
+            mage: "法師",
+            craftsman: "工匠",
+            traveler: "旅人"
+        };
+
+        // 顯示職業資訊
+        document.getElementById('classInfo').textContent = `你選擇的職業：${classNames[selectedClass]}`;
+
+        // 註冊表單處理
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const nickname = document.getElementById('nickname').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const personality = document.getElementById('personality').value;
+            const abilities = document.getElementById('abilities').value;
+            const description = document.getElementById('description').value;
+            
+            try {
+                // 創建用戶帳號
+                const userCredential = await firebase.auth().createUserWithEmailAndPassword(email, password);
+                const user = userCredential.user;
+                
+                // 保存用戶資料到 Firestore
+                const userData = {
+                    nickname,
+                    email,
+                    class: selectedClass,
+                    personality,
+                    abilities,
+                    description,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                };
+                await firebase.firestore().collection('users').doc(user.uid).set(userData);
+                
+                // 清除 sessionStorage
+                sessionStorage.removeItem('selectedClass');
+                
+                // 跳轉到對應的職業頁面
+                window.location.href = `${selectedClass}.html`;
+            } catch (error) {
+                const errorMessage = document.getElementById('errorMessage');
+                errorMessage.style.display = 'block';
+                errorMessage.textContent = error.message;
+            }
+        });
+    </script>
+</body>
+</html> 
