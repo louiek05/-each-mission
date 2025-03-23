@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>勇者之證 - 登入</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600&display=swap" rel="stylesheet">
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <style>
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: radial-gradient(circle at center,
+                #FAEBD7 0%,
+                #A0522D 70%,
+                #8B4513 100%
+            );
+            font-family: 'Noto Serif TC', serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .container {
+            width: 80%;
+            max-width: 500px;
+            background: rgba(139, 69, 19, 0.9);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+            position: relative;
+            z-index: 1;
+        }
+
+        h1 {
+            text-align: center;
+            color: #FFD700;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #FFE4B5;
+            font-size: 1.1em;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #DEB887;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #FFE4B5;
+            font-size: 1.1em;
+            font-family: 'Noto Serif TC', serif;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #FFD700;
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+        }
+
+        .btn {
+            background: #FAEBD7;
+            color: #8B4513;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 1.2em;
+            margin: 10px 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Noto Serif TC', serif;
+            font-weight: 600;
+            border: 2px solid #DEB887;
+            width: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(250, 235, 215, 0.4);
+            background: #FFE4B5;
+        }
+
+        .error-message {
+            color: #FF6B6B;
+            text-align: center;
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            background: rgba(255, 107, 107, 0.2);
+            border: 1px solid #FF6B6B;
+            display: none;
+        }
+
+        .loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(139, 69, 19, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .loading-content {
+            color: #FFD700;
+            text-align: center;
+            background: rgba(139, 69, 19, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid #DEB887;
+        }
+
+        .loading-spinner {
+            border: 4px solid #DEB887;
+            border-top: 4px solid #FFD700;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div id="loading" class="loading">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <p>正在登入...</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <h1>勇者之證 - 登入</h1>
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="email">電子郵件</label>
+                <input type="email" id="email" required>
+            </div>
+            <div class="form-group">
+                <label for="password">密碼</label>
+                <input type="password" id="password" required>
+            </div>
+            <button type="submit" class="btn">登入</button>
+            <button type="button" class="btn" onclick="window.location.href='quiz.html'" style="background: #DEB887;">
+                還沒有帳號？點此註冊
+            </button>
+        </form>
+        <div id="errorMessage" class="error-message"></div>
+    </div>
+
+    <script>
+        function showError(message) {
+            const errorMessage = document.getElementById('errorMessage');
+            errorMessage.style.display = 'block';
+            errorMessage.textContent = message;
+        }
+
+        function showLoading(show = true) {
+            document.getElementById('loading').style.display = show ? 'flex' : 'none';
+        }
+
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+
+            showLoading(true);
+
+            try {
+                // 登入用戶
+                const userCredential = await firebase.auth().signInWithEmailAndPassword(email, password);
+                const user = userCredential.user;
+
+                // 獲取用戶資料
+                const doc = await firebase.firestore().collection('users').doc(user.uid).get();
+                
+                if (doc.exists) {
+                    const userData = doc.data();
+                    // 根據用戶的職業類別跳轉到對應的頁面
+                    window.location.href = `${userData.class}.html?id=${user.uid}`;
+                } else {
+                    showLoading(false);
+                    showError('找不到用戶資料');
+                }
+            } catch (error) {
+                showLoading(false);
+                showError('登入失敗：' + error.message);
+            }
+        });
+    </script>
+</body>
+</html>
