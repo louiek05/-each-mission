@@ -214,6 +214,28 @@
             border-radius: 5px;
             margin-top: 10px;
         }
+
+        .char-count {
+        text-align: right;
+        color: #FFE4B5;
+        font-size: 0.9em;
+        margin-top: 5px;
+    }
+
+    textarea {
+        width: 100%;
+        padding: 12px;
+        border: 2px solid #DEB887;
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.1);
+        color: #FFE4B5;
+        font-size: 1.1em;
+        font-family: 'Noto Serif TC', serif;
+    }
+
+    textarea.limit-reached {
+        border-color: #FF6B6B;
+    }
     </style>
 </head>
 <body>
@@ -251,16 +273,19 @@
                 </div>
             </div>
             <div class="form-group">
-                <label for="personality">性格特質</label>
-                <textarea id="personality" rows="3" required placeholder="請描述您的性格特質..."></textarea>
+                 <label for="personality">性格特質（限制10字）</label>
+                 <textarea id="personality" rows="3" required placeholder="請描述您的性格特質..." maxlength="10"></textarea>
+                 <div class="char-count"><span id="personalityCount">0</span>/10</div>
             </div>
-            <div class="form-group">
-                <label for="abilities">核心能力</label>
-                <textarea id="abilities" rows="3" required placeholder="請描述您的核心能力..."></textarea>
+                 <div class="form-group">
+                 <label for="abilities">核心能力（限制10字）</label>
+                 <textarea id="abilities" rows="3" required placeholder="請描述您的核心能力..." maxlength="10"></textarea>
+                 <div class="char-count"><span id="abilitiesCount">0</span>/10</div>
             </div>
-            <div class="form-group">
-                <label for="description">個人描述</label>
-                <textarea id="description" rows="4" required placeholder="請描述您自己..."></textarea>
+                 <div class="form-group">
+                 <label for="description">個人描述（限制10字）</label>
+                 <textarea id="description" rows="4" required placeholder="請描述您自己..." maxlength="10"></textarea>
+                 <div class="char-count"><span id="descriptionCount">0</span>/10</div>
             </div>
             <button type="submit" class="btn">完成註冊</button>
         </form>
@@ -268,6 +293,28 @@
     </div>
 
     <script>
+         function setupCharCount(textareaId, countId) {
+        const textarea = document.getElementById(textareaId);
+        const countSpan = document.getElementById(countId);
+        
+        textarea.addEventListener('input', function() {
+            const count = this.value.length;
+            countSpan.textContent = count;
+            
+            // 當達到字數限制時改變邊框顏色
+            if (count >= 10) {
+                this.classList.add('limit-reached');
+            } else {
+                this.classList.remove('limit-reached');
+            }
+        });
+    }
+
+    // 設置每個文本框的字數計數
+    setupCharCount('personality', 'personalityCount');
+    setupCharCount('abilities', 'abilitiesCount');
+    setupCharCount('description', 'descriptionCount');
+        
         // 職業名稱映射
         const classNames = {
             warrior: "鬥士",
