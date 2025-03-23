@@ -421,7 +421,7 @@
             right: 5px;
             transform: rotate(135deg);
         }
-    </style>
+       </style>
 </head>
 <body>
     <div class="button-container">
@@ -439,17 +439,20 @@
             <h1 class="card-title">旅人</h1>
             <div class="avatar"></div>
             <div class="nickname-container">
-                <div class="nickname" id="nickname"></div>
+                <div class="nickname" id="nickname">載入中...</div>
             </div>
             <div class="attributes">
                 <div class="attribute">
-                    <strong>性格特質：</strong><div class="attribute-content" id="personality"></div>
+                    <strong>性格特質：</strong>
+                    <div class="attribute-content" id="personality">載入中...</div>
                 </div>
                 <div class="attribute">
-                    <strong>核心能力：</strong><div class="attribute-content" id="abilities"></div>
+                    <strong>核心能力：</strong>
+                    <div class="attribute-content" id="abilities">載入中...</div>
                 </div>
                 <div class="attribute">
-                    <strong>職業描述：</strong><div class="attribute-content" id="description"></div>
+                    <strong>職業描述：</strong>
+                    <div class="attribute-content" id="description">載入中...</div>
                 </div>
             </div>
             <p class="motto">
@@ -457,5 +460,46 @@
             </p>
         </div>
     </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    
+    <script>
+        // 從 URL 獲取用戶 ID
+        function getUserIdFromUrl() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('id');
+        }
+
+        // 頁面載入時執行
+        window.addEventListener('load', async function() {
+            const userId = getUserIdFromUrl();
+            if (!userId) {
+                alert('無法獲取用戶ID，請重新進入頁面');
+                return;
+            }
+
+            try {
+                const doc = await firebase.firestore().collection('users').doc(userId).get();
+                
+                if (doc.exists) {
+                    const userData = doc.data();
+                    // 更新頁面內容
+                    document.getElementById('nickname').textContent = userData.nickname || '未設置';
+                    document.getElementById('personality').textContent = userData.personality || '未設置';
+                    document.getElementById('abilities').textContent = userData.abilities || '未設置';
+                    document.getElementById('description').textContent = userData.description || '未設置';
+                } else {
+                    alert('找不到用戶資料');
+                }
+            } catch (error) {
+                console.error('Error loading user data:', error);
+                alert('載入資料時發生錯誤');
+            }
+        });
+    </script>
 </body>
-</html> 
+</html>
