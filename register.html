@@ -226,7 +226,7 @@
                 sessionStorage.removeItem('selectedClass');
                 
                 // 跳轉到對應的職業頁面
-                window.location.href = `${selectedClass}.html`;
+                window.location.href = `${selectedClass}.html?id=${user.uid}`;
             } catch (error) {
                 const errorMessage = document.getElementById('errorMessage');
                 errorMessage.style.display = 'block';
