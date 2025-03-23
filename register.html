@@ -343,7 +343,6 @@
                 uppercase: /[A-Z]/.test(formData.password),
                 lowercase: /[a-z]/.test(formData.password),
                 number: /[0-9]/.test(formData.password),
-                special: /[!@#$%^&*]/.test(formData.password)
             };
 
             if (!Object.values(passwordRequirements).every(Boolean)) {
