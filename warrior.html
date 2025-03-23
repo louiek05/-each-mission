@@ -6,10 +6,9 @@
     <title>戰士 - 勇者之證</title>
     <link href="https://fonts.googleapis.com/css2?family=ZCOOL+XiaoWei&family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
     <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-firestore-compat.js"></script>
-    <!-- Firebase 配置文件 -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
     <script src="firebase-config.js"></script>
     <style>
         body {
@@ -426,37 +425,51 @@
         </div>
     </div>
 
-    <script>
-        const db = firebase.firestore();
-        const auth = firebase.auth();
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
 
-        // 檢查用戶是否已登入
-        auth.onAuthStateChanged(function(user) {
-            if (user) {
-                // 用戶已登入，獲取用戶資料
-                db.collection('users').doc(user.uid).get()
-                    .then(doc => {
-                        if (doc.exists && doc.data().class === 'warrior') {
-                            const userData = doc.data();
-                            // 更新頁面內容
-                            document.getElementById('nickname').textContent = userData.nickname;
-                            document.getElementById('personality').textContent = userData.personality;
-                            document.getElementById('abilities').textContent = userData.abilities;
-                            document.getElementById('description').textContent = userData.description;
-                        } else {
-                            // 如果用戶不是戰士，跳轉到註冊頁面
-                            window.location.href = 'register.html';
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error getting user data:', error);
-                        window.location.href = 'register.html';
-                    });
-            } else {
-                // 用戶未登入，跳轉到註冊頁面
-                window.location.href = 'register.html';
+    <script>
+        // 從 URL 獲取用戶 ID
+        function getUserIdFromUrl() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('id');
+        }
+
+        // 頁面載入時執行
+        window.addEventListener('load', async function() {
+            const userId = getUserIdFromUrl();
+            if (!userId) {
+                alert('無法獲取用戶ID，請重新進入頁面');
+                return;
+            }
+
+            try {
+                // 確保 Firebase 已初始化
+                if (!firebase.apps.length) {
+                    firebase.initializeApp(window.firebaseConfig);
+                }
+                
+                const db = firebase.firestore();
+                const doc = await db.collection('users').doc(userId).get();
+                
+                if (doc.exists) {
+                    const userData = doc.data();
+                    // 更新頁面內容
+                    document.getElementById('nickname').textContent = userData.nickname || '未設置';
+                    document.getElementById('personality').textContent = userData.personality || '未設置';
+                    document.getElementById('abilities').textContent = userData.abilities || '未設置';
+                    document.getElementById('description').textContent = userData.description || '未設置';
+                } else {
+                    alert('找不到用戶資料');
+                }
+            } catch (error) {
+                console.error('Error loading user data:', error);
+                alert('載入資料時發生錯誤');
             }
         });
     </script>
 </body>
-</html> 
+</html>
