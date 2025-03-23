@@ -5,6 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>勇者之證 - 註冊</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600&display=swap" rel="stylesheet">
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
     <style>
         body {
             margin: 0;
@@ -131,9 +136,94 @@
             background: rgba(0, 0, 0, 0.2);
             border-radius: 8px;
         }
+        .loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(139, 69, 19, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .loading-content {
+            color: #FFD700;
+            text-align: center;
+            background: rgba(139, 69, 19, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid #DEB887;
+        }
+
+        .loading-spinner {
+            border: 4px solid #DEB887;
+            border-top: 4px solid #FFD700;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .password-requirements {
+            background: rgba(139, 69, 19, 0.6);
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 5px;
+            display: none;
+            border: 1px solid #DEB887;
+        }
+
+        .requirement {
+            color: #FFE4B5;
+            margin: 5px 0;
+            padding-left: 20px;
+            position: relative;
+            font-size: 0.9em;
+            transition: color 0.3s ease;
+        }
+
+        .requirement::before {
+            content: '✗';
+            position: absolute;
+            left: 0;
+            color: #FF6B6B;
+        }
+
+        .requirement.valid {
+            color: #90EE90;
+        }
+
+        .requirement.valid::before {
+            content: '✓';
+            color: #90EE90;
+        }
+
+        .error-message {
+            background: rgba(255, 107, 107, 0.2);
+            border: 1px solid #FF6B6B;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
+    <div id="loading" class="loading">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <p>正在創建您的勇者之證...</p>
+        </div>
+    </div>
+
     <div class="container">
         <h1>勇者之證 - 註冊</h1>
         <div id="classInfo" class="class-info"></div>
@@ -153,6 +243,13 @@
             <div class="form-group">
                 <label for="password">密碼</label>
                 <input type="password" id="password" required>
+                <div id="passwordRequirements" class="password-requirements">
+                    <div class="requirement" data-requirement="length">至少 8 個字元</div>
+                    <div class="requirement" data-requirement="uppercase">至少一個大寫字母</div>
+                    <div class="requirement" data-requirement="lowercase">至少一個小寫字母</div>
+                    <div class="requirement" data-requirement="number">至少一個數字</div>
+                    <div class="requirement" data-requirement="special">至少一個特殊字元 (!@#$%^&*)</div>
+                </div>
             </div>
             <div class="form-group">
                 <label for="personality">性格特質</label>
@@ -168,20 +265,10 @@
             </div>
             <button type="submit" class="btn">完成註冊</button>
         </form>
-        <div id="errorMessage" class="error-message"></div>
+        <div id="errorMessage" class="error-message" style="display: none;"></div>
     </div>
 
-    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
-    <script src="firebase-config.js"></script>
     <script>
-        // 檢查是否從測驗頁面來
-        const selectedClass = sessionStorage.getItem('selectedClass');
-        if (!selectedClass) {
-            window.location.href = 'quiz.html';
-        }
-
         // 職業名稱映射
         const classNames = {
             warrior: "鬥士",
@@ -191,48 +278,107 @@
             traveler: "旅人"
         };
 
+        // 檢查是否從測驗頁面來
+        const selectedClass = sessionStorage.getItem('selectedClass');
+        if (!selectedClass) {
+            window.location.href = 'quiz.html';
+        }
+
         // 顯示職業資訊
         document.getElementById('classInfo').textContent = `你選擇的職業：${classNames[selectedClass]}`;
 
-        // 註冊表單處理
+        // 密碼輸入監聽
+        document.getElementById('password').addEventListener('focus', function() {
+            document.getElementById('passwordRequirements').style.display = 'block';
+        });
+
+        document.getElementById('password').addEventListener('input', function(e) {
+            const password = e.target.value;
+            const requirements = {
+                length: password.length >= 8,
+                uppercase: /[A-Z]/.test(password),
+                lowercase: /[a-z]/.test(password),
+                number: /[0-9]/.test(password),
+                special: /[!@#$%^&*]/.test(password)
+            };
+
+            Object.entries(requirements).forEach(([key, valid]) => {
+                document.querySelector(`[data-requirement="${key}"]`)
+                    .classList.toggle('valid', valid);
+            });
+        });
+
+        // 顯示錯誤訊息
+        function showError(message) {
+            const errorMessage = document.getElementById('errorMessage');
+            errorMessage.style.display = 'block';
+            errorMessage.textContent = message;
+        }
+
+        // 顯示載入動畫
+        function showLoading(show = true) {
+            document.getElementById('loading').style.display = show ? 'flex' : 'none';
+        }
+
+        // 表單提交處理
         document.getElementById('registerForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            const nickname = document.getElementById('nickname').value;
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            const personality = document.getElementById('personality').value;
-            const abilities = document.getElementById('abilities').value;
-            const description = document.getElementById('description').value;
-            
+            const formData = {
+                nickname: document.getElementById('nickname').value.trim(),
+                email: document.getElementById('email').value.trim(),
+                password: document.getElementById('password').value,
+                personality: document.getElementById('personality').value.trim(),
+                abilities: document.getElementById('abilities').value.trim(),
+                description: document.getElementById('description').value.trim()
+            };
+
+            // 基本驗證
+            if (formData.nickname.length < 2) {
+                showError('暱稱至少需要 2 個字元');
+                return;
+            }
+
+            // 密碼驗證
+            const passwordRequirements = {
+                length: formData.password.length >= 8,
+                uppercase: /[A-Z]/.test(formData.password),
+                lowercase: /[a-z]/.test(formData.password),
+                number: /[0-9]/.test(formData.password),
+                special: /[!@#$%^&*]/.test(formData.password)
+            };
+
+            if (!Object.values(passwordRequirements).every(Boolean)) {
+                showError('請確保密碼符合所有要求');
+                return;
+            }
+
+            showLoading(true);
+
             try {
                 // 創建用戶帳號
-                const userCredential = await firebase.auth().createUserWithEmailAndPassword(email, password);
+                const userCredential = await firebase.auth().createUserWithEmailAndPassword(formData.email, formData.password);
                 const user = userCredential.user;
-                
+
                 // 保存用戶資料到 Firestore
                 const userData = {
-                    nickname,
-                    email,
+                    nickname: formData.nickname,
+                    email: formData.email,
                     class: selectedClass,
-                    personality,
-                    abilities,
-                    description,
+                    personality: formData.personality,
+                    abilities: formData.abilities,
+                    description: formData.description,
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 };
+
                 await firebase.firestore().collection('users').doc(user.uid).set(userData);
-                
-                // 清除 sessionStorage
                 sessionStorage.removeItem('selectedClass');
-                
-                // 跳轉到對應的職業頁面
                 window.location.href = `${selectedClass}.html?id=${user.uid}`;
             } catch (error) {
-                const errorMessage = document.getElementById('errorMessage');
-                errorMessage.style.display = 'block';
-                errorMessage.textContent = error.message;
+                showLoading(false);
+                showError(error.message);
             }
         });
     </script>
 </body>
-</html> 
+</html>
