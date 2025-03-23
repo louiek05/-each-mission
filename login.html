@@ -28,7 +28,7 @@
             overflow: hidden;
         }
 
- .container {
+.container {
         width: 80%;
         max-width: 500px;
         background: rgba(139, 69, 19, 0.9);
@@ -50,7 +50,7 @@
 
     .form-group {
         margin-bottom: 20px;
-        padding: 0 20px;  /* 添加左右內邊距 */
+        padding: 0 20px;
     }
 
     label {
@@ -73,15 +73,26 @@
     }
 
     .btn {
-        width: calc(100% - 40px);
-        margin: 10px 20px;
+        background: #FAEBD7;
+        color: #8B4513;
+        border: none;
+        padding: 12px 30px;
+        border-radius: 25px;
+        font-size: 1.2em;
+        margin: 10px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-family: 'Noto Serif TC', serif;
+        font-weight: 600;
+        border: 2px solid #DEB887;
+        width: 100%;
     }
 
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(250, 235, 215, 0.4);
-            background: #FFE4B5;
-        }
+       .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(250, 235, 215, 0.4);
+        background: #FFE4B5;
+    }
 
         .error-message {
             color: #FF6B6B;
