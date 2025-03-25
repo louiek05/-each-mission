@@ -77,15 +77,6 @@ window.updateUserData = async (userId, data) => {
     }
 };
 
-window.getMissions = async () => {
-    try {
-        // 檢查用戶是否已登入
-        const user = window.auth.currentUser;
-        if (!user) {
-            console.log('用戶未登入');
-            return [];
-        }
-
        // 獲取任務列表
 window.getMissions = async function() {
     try {
