@@ -79,6 +79,14 @@ window.updateUserData = async (userId, data) => {
 
 window.getMissions = async () => {
     try {
+        // 檢查用戶是否已登入
+        const user = window.auth.currentUser;
+        if (!user) {
+            console.log('用戶未登入');
+            return [];
+        }
+
+        // 獲取任務列表
         const snapshot = await window.db.collection('missions').get();
         return snapshot.docs.map(doc => ({
             id: doc.id,
