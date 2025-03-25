@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>勇者之證 - 任務公佈欄</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: radial-gradient(circle at center,
+                #FAEBD7 0%,
+                #A0522D 70%,
+                #8B4513 100%
+            );
+            font-family: 'Noto Serif TC', serif;
+            color: #fff;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #FFD700;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .missions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .mission-card {
+            background: rgba(139, 69, 19, 0.9);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease;
+            cursor: pointer;
+            border: 2px solid #DEB887;
+            display: flex;
+            height: 200px;
+        }
+
+        .mission-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+        }
+
+        .mission-info {
+            padding: 15px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .mission-title {
+            color: #FFD700;
+            font-size: 1.3em;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .mission-description {
+            color: #FFE4B5;
+            font-size: 1em;
+            line-height: 1.4;
+            flex-grow: 1;
+        }
+
+        .mission-details {
+            color: #DEB887;
+            font-size: 0.9em;
+            margin-top: 10px;
+        }
+
+        .mission-image {
+            width: 150px;
+            height: 100%;
+            object-fit: cover;
+            border-left: 2px solid #DEB887;
+        }
+
+        .filter-bar {
+            background: rgba(139, 69, 19, 0.9);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            border: 2px solid #DEB887;
+        }
+
+        .filter-btn {
+            background: #FAEBD7;
+            color: #8B4513;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-family: 'Noto Serif TC', serif;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: 2px solid #DEB887;
+        }
+
+        .filter-btn:hover, .filter-btn.active {
+            background: #FFE4B5;
+            transform: translateY(-2px);
+        }
+
+        .mission-status {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            background: rgba(255, 215, 0, 0.2);
+            border: 1px solid #FFD700;
+            color: #FFD700;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>任務公佈欄</h1>
+        
+        <div class="filter-bar">
+            <button class="filter-btn active">全部任務</button>
+            <button class="filter-btn">進行中</button>
+            <button class="filter-btn">已完成</button>
+            <button class="filter-btn">緊急任務</button>
+        </div>
+
+        <div class="missions-grid">
+            <!-- 任務卡片示例 -->
+            <div class="mission-card" onclick="window.location.href='mission-detail.html?id=1'">
+                <div class="mission-info">
+                    <div>
+                        <div class="mission-title">尋找失落的寶藏</div>
+                        <div class="mission-description">在古老的森林深處，據說藏有一個神秘的寶箱，需要勇敢的冒險者前去探索。</div>
+                    </div>
+                    <div class="mission-details">
+                        報酬: 500金幣<br>
+                        發布者: 旅人小明<br>
+                        時限: 3天
+                    </div>
+                </div>
+                <img src="path/to/mission-image.jpg" alt="任務圖片" class="mission-image">
+            </div>
+
+            <!-- 可以複製多個任務卡片來填滿頁面 -->
+        </div>
+    </div>
+</body>
+</html>
