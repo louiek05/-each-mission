@@ -54,6 +54,7 @@
             border: 2px solid #DEB887;
             display: flex;
             height: 200px;
+            position: relative;
         }
 
         .mission-card:hover {
@@ -81,6 +82,11 @@
             font-size: 1em;
             line-height: 1.4;
             flex-grow: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
         }
 
         .mission-details {
@@ -105,6 +111,7 @@
             justify-content: center;
             gap: 15px;
             border: 2px solid #DEB887;
+            flex-wrap: wrap;
         }
 
         .filter-btn {
@@ -118,6 +125,7 @@
             font-weight: 600;
             transition: all 0.3s ease;
             border: 2px solid #DEB887;
+            min-width: 100px;
         }
 
         .filter-btn:hover, .filter-btn.active {
@@ -136,151 +144,140 @@
             border: 1px solid #FFD700;
             color: #FFD700;
         }
-        .back-btn {
-    position: fixed;
-    top: 20px;
-    left: 20px;
-    background: #8B4513;
-    color: #FFD700;
-    border: 2px solid #DEB887;
-    padding: 10px 20px;
-    border-radius: 20px;
-    cursor: pointer;
-    font-family: 'Noto Serif TC', serif;
-    font-weight: 600;
-    transition: all 0.3s ease;
-    z-index: 1000;
-}
 
-.user-info {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    background: rgba(139, 69, 19, 0.9);
-    color: #FFD700;
-    padding: 10px 20px;
-    border-radius: 20px;
-    border: 2px solid #DEB887;
-    font-family: 'Noto Serif TC', serif;
-    z-index: 1000;
-}
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: #8B4513;
+            color: #FFD700;
+            border: 2px solid #DEB887;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-family: 'Noto Serif TC', serif;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .back-btn:hover {
+            background: #A0522D;
+            transform: translateY(-2px);
+        }
+
+        .user-info {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(139, 69, 19, 0.9);
+            color: #FFD700;
+            padding: 10px 20px;
+            border-radius: 20px;
+            border: 2px solid #DEB887;
+            font-family: 'Noto Serif TC', serif;
+            z-index: 1000;
+            max-width: 300px;
+            text-align: center;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
         .loading-message {
-    text-align: center;
-    color: #FFD700;
-    font-size: 1.2em;
-    padding: 20px;
-    grid-column: 1 / -1;
-}
+            text-align: center;
+            color: #FFD700;
+            font-size: 1.2em;
+            padding: 20px;
+            grid-column: 1 / -1;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            .mission-card {
+                height: auto;
+                flex-direction: column;
+            }
+
+            .mission-image {
+                width: 100%;
+                height: 150px;
+                border-left: none;
+                border-top: 2px solid #DEB887;
+            }
+
+            .filter-bar {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .filter-btn {
+                width: 100%;
+                max-width: 200px;
+            }
+        }
     </style>
 </head>
 <body>
     <button class="back-btn" onclick="goBack()">返回個人頁面</button>
     <div class="user-info" id="userInfo">載入中...</div>
-   <div class="container">
-    <h1>任務公佈欄</h1>
-    
-    <div class="filter-bar">
-        <button class="filter-btn active">全部任務</button>
-        <button class="filter-btn">進行中</button>
-        <button class="filter-btn">已完成</button>
-        <button class="filter-btn">緊急任務</button>
+    <div class="container">
+        <h1>任務公佈欄</h1>
+        
+        <div class="filter-bar">
+            <button class="filter-btn active">全部任務</button>
+            <button class="filter-btn">進行中</button>
+            <button class="filter-btn">已完成</button>
+            <button class="filter-btn">緊急任務</button>
+        </div>
+
+        <div class="missions-grid" id="missionsGrid">
+            <div class="loading-message">載入任務中...</div>
+        </div>
     </div>
 
-    <div class="missions-grid" id="missionsGrid">
-        <div class="loading-message">載入任務中...</div>
-    </div>
-</div>
-
-     <script>
+    <script>
         // 從 URL 獲取用戶 ID
         function getUserIdFromUrl() {
             const urlParams = new URLSearchParams(window.location.search);
             return urlParams.get('id');
         }
 
+        // 返回個人頁面
         async function goBack() {
-    const userId = getUserIdFromUrl();
-    try {
-        const userClass = await window.getUserClass(userId);
-        if (userClass) {
-            window.location.href = `${userClass}.html?id=${userId}`;
-        } else {
-            alert('找不到用戶職業資料');
-            window.location.href = 'index.html';
-        }
-    } catch (error) {
-        console.error('Error getting user class:', error);
-        alert('載入資料時發生錯誤');
-        window.location.href = 'index.html';
-    }
-}
-
-      // 在頁面載入時執行
-window.addEventListener('load', async function() {
-    const userId = getUserIdFromUrl();
-    if (!userId) {
-        alert('無法獲取用戶ID，請重新進入頁面');
-        window.location.href = 'index.html';
-        return;
-    }
-
-    try {
-        // 檢查用戶是否已登入
-        const user = firebase.auth().currentUser;
-        if (!user) {
-            alert('請先登入');
-            window.location.href = 'index.html';
-            return;
+            const userId = getUserIdFromUrl();
+            try {
+                const userClass = await window.getUserClass(userId);
+                if (userClass) {
+                    window.location.href = `${userClass}.html?id=${userId}`;
+                } else {
+                    alert('找不到用戶職業資料');
+                    window.location.href = 'index.html';
+                }
+            } catch (error) {
+                console.error('Error getting user class:', error);
+                alert('載入資料時發生錯誤');
+                window.location.href = 'index.html';
+            }
         }
 
-        // 使用 firebase-config.js 中的函數
-        const userData = await window.getUserData(userId);
-        
-        if (userData) {
-            document.getElementById('userInfo').textContent = `歡迎，${userData.nickname || '勇者'}`;
-            loadMissions();
-        } else {
-            alert('找不到用戶資料');
-            window.location.href = 'index.html';
-        }
-    } catch (error) {
-        console.error('Error loading user data:', error);
-        alert('載入資料時發生錯誤');
-        window.location.href = 'index.html';
-    }
-});
-
-        // 添加 loadMissions 函数
-       async function loadMissions() {
-    const missionsGrid = document.querySelector('.missions-grid');
-    missionsGrid.innerHTML = '<div class="loading-message">載入任務中...</div>';
-    
-    try {
-        const missions = await window.getMissions();
-        
-        if (missions.length === 0) {
-            missionsGrid.innerHTML = '<div class="loading-message">目前沒有可接的任務</div>';
-            return;
-        }
-        
-        missionsGrid.innerHTML = ''; // 清空載入訊息
-        missions.forEach(mission => {
-            const missionCard = createMissionCard(mission.id, mission);
-            missionsGrid.appendChild(missionCard);
-        });
-    } catch (error) {
-        console.error('Error loading missions:', error);
-        missionsGrid.innerHTML = '<div class="loading-message">載入任務時發生錯誤</div>';
-    }
-}
-
-        // 添加 createMissionCard 函数
+        // 創建任務卡片
         function createMissionCard(missionId, mission) {
             const card = document.createElement('div');
             card.className = 'mission-card';
             card.onclick = () => window.location.href = `mission-detail.html?id=${missionId}&userId=${getUserIdFromUrl()}`;
             
+            // 根據任務狀態添加狀態標籤
+            let statusHtml = '';
+            if (mission.status) {
+                statusHtml = `<div class="mission-status">${mission.status}</div>`;
+            }
+            
             card.innerHTML = `
+                ${statusHtml}
                 <div class="mission-info">
                     <div>
                         <div class="mission-title">${mission.title || '未命名任務'}</div>
@@ -297,6 +294,80 @@ window.addEventListener('load', async function() {
             
             return card;
         }
+
+        // 載入任務列表
+        async function loadMissions(filterType = '全部任務') {
+            const missionsGrid = document.querySelector('.missions-grid');
+            missionsGrid.innerHTML = '<div class="loading-message">載入任務中...</div>';
+            
+            try {
+                const missions = await window.getMissions();
+                
+                if (missions.length === 0) {
+                    missionsGrid.innerHTML = '<div class="loading-message">目前沒有可接的任務</div>';
+                    return;
+                }
+                
+                let filteredMissions = missions;
+                if (filterType !== '全部任務') {
+                    switch(filterType) {
+                        case '進行中':
+                            filteredMissions = missions.filter(m => m.status === '進行中');
+                            break;
+                        case '已完成':
+                            filteredMissions = missions.filter(m => m.status === '已完成');
+                            break;
+                        case '緊急任務':
+                            filteredMissions = missions.filter(m => m.priority === 'high');
+                            break;
+                    }
+                }
+                
+                missionsGrid.innerHTML = '';
+                filteredMissions.forEach(mission => {
+                    const missionCard = createMissionCard(mission.id, mission);
+                    missionsGrid.appendChild(missionCard);
+                });
+            } catch (error) {
+                console.error('Error loading missions:', error);
+                missionsGrid.innerHTML = '<div class="loading-message">載入任務時發生錯誤</div>';
+            }
+        }
+
+        // 頁面載入時執行
+        window.addEventListener('load', async function() {
+            const userId = getUserIdFromUrl();
+            if (!userId) {
+                alert('無法獲取用戶ID，請重新進入頁面');
+                window.location.href = 'index.html';
+                return;
+            }
+
+            try {
+                const userData = await window.getUserData(userId);
+                
+                if (userData) {
+                    document.getElementById('userInfo').textContent = `歡迎，${userData.nickname || '勇者'}`;
+                    loadMissions();
+                } else {
+                    alert('找不到用戶資料');
+                    window.location.href = 'index.html';
+                }
+            } catch (error) {
+                console.error('Error loading user data:', error);
+                alert('載入資料時發生錯誤');
+                window.location.href = 'index.html';
+            }
+        });
+
+        // 添加過濾功能
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                loadMissions(this.textContent);
+            });
+        });
     </script>
 </body>
 </html>
