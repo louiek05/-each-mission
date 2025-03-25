@@ -86,15 +86,20 @@ window.getMissions = async () => {
             return [];
         }
 
-        // 獲取任務列表
-        const snapshot = await window.db.collection('missions').get();
+       // 獲取任務列表
+window.getMissions = async function() {
+    try {
+        // 移除登入檢查
+        const missionsRef = window.db.collection('missions');
+        const snapshot = await missionsRef.get();
+        
         return snapshot.docs.map(doc => ({
             id: doc.id,
             ...doc.data()
         }));
     } catch (error) {
-        console.error('獲取任務列表失敗:', error);
-        return [];
+        console.error('Error getting missions:', error);
+        throw error;
     }
 };
 
