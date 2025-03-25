@@ -215,7 +215,7 @@
     }
 }
 
-        // 頁面載入時執行
+      // 在頁面載入時執行
 window.addEventListener('load', async function() {
     const userId = getUserIdFromUrl();
     if (!userId) {
@@ -225,6 +225,14 @@ window.addEventListener('load', async function() {
     }
 
     try {
+        // 檢查用戶是否已登入
+        const user = firebase.auth().currentUser;
+        if (!user) {
+            alert('請先登入');
+            window.location.href = 'index.html';
+            return;
+        }
+
         // 使用 firebase-config.js 中的函數
         const userData = await window.getUserData(userId);
         
