@@ -344,14 +344,6 @@ window.addEventListener('load', async function() {
     }
 
     try {
-        // 先檢查登入狀態
-        const currentUser = window.auth.currentUser;
-        if (!currentUser) {
-            alert('請先登入');
-            window.location.href = 'index.html';
-            return;
-        }
-
         const userData = await window.getUserData(userId);
         
         if (userData) {
