@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>勇者之證 - 任務公佈欄</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600&display=swap" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
     <style>
         body {
             margin: 0;
@@ -132,9 +136,39 @@
             border: 1px solid #FFD700;
             color: #FFD700;
         }
+        .back-btn {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    background: #8B4513;
+    color: #FFD700;
+    border: 2px solid #DEB887;
+    padding: 10px 20px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-family: 'Noto Serif TC', serif;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    z-index: 1000;
+}
+
+.user-info {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: rgba(139, 69, 19, 0.9);
+    color: #FFD700;
+    padding: 10px 20px;
+    border-radius: 20px;
+    border: 2px solid #DEB887;
+    font-family: 'Noto Serif TC', serif;
+    z-index: 1000;
+}
     </style>
 </head>
 <body>
+    <button class="back-btn" onclick="goBack()">返回個人頁面</button>
+    <div class="user-info" id="userInfo">載入中...</div>
     <div class="container">
         <h1>任務公佈欄</h1>
         
@@ -165,5 +199,96 @@
             <!-- 可以複製多個任務卡片來填滿頁面 -->
         </div>
     </div>
+
+     <script>
+        // 從 URL 獲取用戶 ID
+        function getUserIdFromUrl() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('id');
+        }
+
+        // 返回上一頁
+        function goBack() {
+            const userId = getUserIdFromUrl();
+            window.location.href = `index.html?id=${userId}`;
+        }
+
+        // 頁面載入時執行
+        window.addEventListener('load', async function() {
+            const userId = getUserIdFromUrl();
+            if (!userId) {
+                alert('無法獲取用戶ID，請重新進入頁面');
+                window.location.href = 'index.html';
+                return;
+            }
+
+            try {
+                if (!firebase.apps.length) {
+                    firebase.initializeApp(window.firebaseConfig);
+                }
+                
+                const db = firebase.firestore();
+                const doc = await db.collection('users').doc(userId).get();
+                
+                if (doc.exists) {
+                    const userData = doc.data();
+                    document.getElementById('userInfo').textContent = `歡迎，${userData.nickname || '勇者'}`;
+                    
+                    loadMissions();
+                } else {
+                    alert('找不到用戶資料');
+                    window.location.href = 'index.html';
+                }
+            } catch (error) {
+                console.error('Error loading user data:', error);
+                alert('載入資料時發生錯誤');
+                window.location.href = 'index.html';
+            }
+        });
+
+        // 添加 loadMissions 函数
+        async function loadMissions() {
+            try {
+                const db = firebase.firestore();
+                const missionsSnapshot = await db.collection('missions').get();
+                
+                const missionsGrid = document.querySelector('.missions-grid');
+                missionsGrid.innerHTML = ''; // 清空現有內容
+                
+                missionsSnapshot.forEach(doc => {
+                    const mission = doc.data();
+                    const missionCard = createMissionCard(doc.id, mission);
+                    missionsGrid.appendChild(missionCard);
+                });
+            } catch (error) {
+                console.error('Error loading missions:', error);
+                alert('載入任務時發生錯誤');
+            }
+        }
+
+        // 添加 createMissionCard 函数
+        function createMissionCard(missionId, mission) {
+            const card = document.createElement('div');
+            card.className = 'mission-card';
+            card.onclick = () => window.location.href = `mission-detail.html?id=${missionId}&userId=${getUserIdFromUrl()}`;
+            
+            card.innerHTML = `
+                <div class="mission-info">
+                    <div>
+                        <div class="mission-title">${mission.title || '未命名任務'}</div>
+                        <div class="mission-description">${mission.description || '無描述'}</div>
+                    </div>
+                    <div class="mission-details">
+                        報酬: ${mission.reward || '0'}金幣<br>
+                        發布者: ${mission.publisher || '未知'}<br>
+                        時限: ${mission.deadline || '無限制'}
+                    </div>
+                </div>
+                <img src="${mission.image || 'path/to/default-mission-image.jpg'}" alt="任務圖片" class="mission-image">
+            `;
+            
+            return card;
+        }
+    </script>
 </body>
 </html>
