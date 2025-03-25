@@ -46,6 +46,27 @@ window.getUserData = async (userId) => {
     }
 };
 
+// 職業相關函數
+window.getUserClass = async (userId) => {
+    try {
+        const userData = await window.getUserData(userId);
+        return userData ? userData.class : null;
+    } catch (error) {
+        console.error('獲取用戶職業失敗:', error);
+        return null;
+    }
+};
+
+window.updateUserClass = async (userId, classType) => {
+    try {
+        await window.updateUserData(userId, { class: classType });
+        return true;
+    } catch (error) {
+        console.error('更新用戶職業失敗:', error);
+        return false;
+    }
+};
+
 window.updateUserData = async (userId, data) => {
     try {
         await window.db.collection('users').doc(userId).update(data);
