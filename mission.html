@@ -164,41 +164,32 @@
     font-family: 'Noto Serif TC', serif;
     z-index: 1000;
 }
+        .loading-message {
+    text-align: center;
+    color: #FFD700;
+    font-size: 1.2em;
+    padding: 20px;
+    grid-column: 1 / -1;
+}
     </style>
 </head>
 <body>
     <button class="back-btn" onclick="goBack()">返回個人頁面</button>
     <div class="user-info" id="userInfo">載入中...</div>
-    <div class="container">
-        <h1>任務公佈欄</h1>
-        
-        <div class="filter-bar">
-            <button class="filter-btn active">全部任務</button>
-            <button class="filter-btn">進行中</button>
-            <button class="filter-btn">已完成</button>
-            <button class="filter-btn">緊急任務</button>
-        </div>
-
-        <div class="missions-grid">
-            <!-- 任務卡片示例 -->
-            <div class="mission-card" onclick="window.location.href='mission-detail.html?id=1'">
-                <div class="mission-info">
-                    <div>
-                        <div class="mission-title">尋找失落的寶藏</div>
-                        <div class="mission-description">在古老的森林深處，據說藏有一個神秘的寶箱，需要勇敢的冒險者前去探索。</div>
-                    </div>
-                    <div class="mission-details">
-                        報酬: 500金幣<br>
-                        發布者: 旅人小明<br>
-                        時限: 3天
-                    </div>
-                </div>
-                <img src="path/to/mission-image.jpg" alt="任務圖片" class="mission-image">
-            </div>
-
-            <!-- 可以複製多個任務卡片來填滿頁面 -->
-        </div>
+   <div class="container">
+    <h1>任務公佈欄</h1>
+    
+    <div class="filter-bar">
+        <button class="filter-btn active">全部任務</button>
+        <button class="filter-btn">進行中</button>
+        <button class="filter-btn">已完成</button>
+        <button class="filter-btn">緊急任務</button>
     </div>
+
+    <div class="missions-grid" id="missionsGrid">
+        <div class="loading-message">載入任務中...</div>
+    </div>
+</div>
 
      <script>
         // 從 URL 獲取用戶 ID
@@ -207,64 +198,73 @@
             return urlParams.get('id');
         }
 
-        // 返回上一頁
-        function goBack() {
-            const userId = getUserIdFromUrl();
-            window.location.href = `index.html?id=${userId}`;
+        async function goBack() {
+    const userId = getUserIdFromUrl();
+    try {
+        const userClass = await window.getUserClass(userId);
+        if (userClass) {
+            window.location.href = `${userClass}.html?id=${userId}`;
+        } else {
+            alert('找不到用戶職業資料');
+            window.location.href = 'index.html';
         }
+    } catch (error) {
+        console.error('Error getting user class:', error);
+        alert('載入資料時發生錯誤');
+        window.location.href = 'index.html';
+    }
+}
 
         // 頁面載入時執行
-        window.addEventListener('load', async function() {
-            const userId = getUserIdFromUrl();
-            if (!userId) {
-                alert('無法獲取用戶ID，請重新進入頁面');
-                window.location.href = 'index.html';
-                return;
-            }
+window.addEventListener('load', async function() {
+    const userId = getUserIdFromUrl();
+    if (!userId) {
+        alert('無法獲取用戶ID，請重新進入頁面');
+        window.location.href = 'index.html';
+        return;
+    }
 
-            try {
-                if (!firebase.apps.length) {
-                    firebase.initializeApp(window.firebaseConfig);
-                }
-                
-                const db = firebase.firestore();
-                const doc = await db.collection('users').doc(userId).get();
-                
-                if (doc.exists) {
-                    const userData = doc.data();
-                    document.getElementById('userInfo').textContent = `歡迎，${userData.nickname || '勇者'}`;
-                    
-                    loadMissions();
-                } else {
-                    alert('找不到用戶資料');
-                    window.location.href = 'index.html';
-                }
-            } catch (error) {
-                console.error('Error loading user data:', error);
-                alert('載入資料時發生錯誤');
-                window.location.href = 'index.html';
-            }
-        });
+    try {
+        // 使用 firebase-config.js 中的函數
+        const userData = await window.getUserData(userId);
+        
+        if (userData) {
+            document.getElementById('userInfo').textContent = `歡迎，${userData.nickname || '勇者'}`;
+            loadMissions();
+        } else {
+            alert('找不到用戶資料');
+            window.location.href = 'index.html';
+        }
+    } catch (error) {
+        console.error('Error loading user data:', error);
+        alert('載入資料時發生錯誤');
+        window.location.href = 'index.html';
+    }
+});
 
         // 添加 loadMissions 函数
-        async function loadMissions() {
-            try {
-                const db = firebase.firestore();
-                const missionsSnapshot = await db.collection('missions').get();
-                
-                const missionsGrid = document.querySelector('.missions-grid');
-                missionsGrid.innerHTML = ''; // 清空現有內容
-                
-                missionsSnapshot.forEach(doc => {
-                    const mission = doc.data();
-                    const missionCard = createMissionCard(doc.id, mission);
-                    missionsGrid.appendChild(missionCard);
-                });
-            } catch (error) {
-                console.error('Error loading missions:', error);
-                alert('載入任務時發生錯誤');
-            }
+       async function loadMissions() {
+    const missionsGrid = document.querySelector('.missions-grid');
+    missionsGrid.innerHTML = '<div class="loading-message">載入任務中...</div>';
+    
+    try {
+        const missions = await window.getMissions();
+        
+        if (missions.length === 0) {
+            missionsGrid.innerHTML = '<div class="loading-message">目前沒有可接的任務</div>';
+            return;
         }
+        
+        missionsGrid.innerHTML = ''; // 清空載入訊息
+        missions.forEach(mission => {
+            const missionCard = createMissionCard(mission.id, mission);
+            missionsGrid.appendChild(missionCard);
+        });
+    } catch (error) {
+        console.error('Error loading missions:', error);
+        missionsGrid.innerHTML = '<div class="loading-message">載入任務時發生錯誤</div>';
+    }
+}
 
         // 添加 createMissionCard 函数
         function createMissionCard(missionId, mission) {
