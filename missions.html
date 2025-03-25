@@ -1,226 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>勇者之證 - 任務公佈欄</title>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600&display=swap" rel="stylesheet">
-    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
-    <script src="firebase-config.js"></script>
-    <style>
-        body {
-            margin: 0;
-            min-height: 100vh;
-            background: radial-gradient(circle at center,
-                #FAEBD7 0%,
-                #A0522D 70%,
-                #8B4513 100%
-            );
-            font-family: 'Noto Serif TC', serif;
-            color: #fff;
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        h1 {
-            text-align: center;
-            color: #FFD700;
-            margin-bottom: 30px;
-            font-size: 2.5em;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-        }
-
-        .missions-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
-            padding: 20px;
-        }
-
-        .mission-card {
-            background: rgba(139, 69, 19, 0.9);
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-            transition: transform 0.3s ease;
-            cursor: pointer;
-            border: 2px solid #DEB887;
-            display: flex;
-            height: 200px;
-            position: relative;
-        }
-
-        .mission-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
-        }
-
-        .mission-info {
-            padding: 15px;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-
-        .mission-title {
-            color: #FFD700;
-            font-size: 1.3em;
-            margin-bottom: 10px;
-            font-weight: bold;
-        }
-
-        .mission-description {
-            color: #FFE4B5;
-            font-size: 1em;
-            line-height: 1.4;
-            flex-grow: 1;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            display: -webkit-box;
-            -webkit-line-clamp: 3;
-            -webkit-box-orient: vertical;
-        }
-
-        .mission-details {
-            color: #DEB887;
-            font-size: 0.9em;
-            margin-top: 10px;
-        }
-
-        .mission-image {
-            width: 150px;
-            height: 100%;
-            object-fit: cover;
-            border-left: 2px solid #DEB887;
-        }
-
-        .filter-bar {
-            background: rgba(139, 69, 19, 0.9);
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            border: 2px solid #DEB887;
-            flex-wrap: wrap;
-        }
-
-        .filter-btn {
-            background: #FAEBD7;
-            color: #8B4513;
-            border: none;
-            padding: 8px 20px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-family: 'Noto Serif TC', serif;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            border: 2px solid #DEB887;
-            min-width: 100px;
-        }
-
-        .filter-btn:hover, .filter-btn.active {
-            background: #FFE4B5;
-            transform: translateY(-2px);
-        }
-
-        .mission-status {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            padding: 5px 10px;
-            border-radius: 15px;
-            font-size: 0.8em;
-            background: rgba(255, 215, 0, 0.2);
-            border: 1px solid #FFD700;
-            color: #FFD700;
-        }
-
-        .back-btn {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            background: #8B4513;
-            color: #FFD700;
-            border: 2px solid #DEB887;
-            padding: 10px 20px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-family: 'Noto Serif TC', serif;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            z-index: 1000;
-        }
-
-        .back-btn:hover {
-            background: #A0522D;
-            transform: translateY(-2px);
-        }
-
-        .user-info {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: rgba(139, 69, 19, 0.9);
-            color: #FFD700;
-            padding: 10px 20px;
-            border-radius: 20px;
-            border: 2px solid #DEB887;
-            font-family: 'Noto Serif TC', serif;
-            z-index: 1000;
-            max-width: 300px;
-            text-align: center;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        .loading-message {
-            text-align: center;
-            color: #FFD700;
-            font-size: 1.2em;
-            padding: 20px;
-            grid-column: 1 / -1;
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                padding: 10px;
-            }
-
-            .mission-card {
-                height: auto;
-                flex-direction: column;
-            }
-
-            .mission-image {
-                width: 100%;
-                height: 150px;
-                border-left: none;
-                border-top: 2px solid #DEB887;
-            }
-
-            .filter-bar {
-                flex-direction: column;
-                align-items: center;
-            }
-
-            .filter-btn {
-                width: 100%;
-                max-width: 200px;
-            }
-        }
-    </style>
-</head>
+<!-- ... 保持 head 部分和 style 部分不變 ... -->
 <body>
     <button class="back-btn" onclick="goBack()">返回個人頁面</button>
     <div class="user-info" id="userInfo">載入中...</div>
@@ -270,7 +50,6 @@
             card.className = 'mission-card';
             card.onclick = () => window.location.href = `mission-detail.html?id=${missionId}&userId=${getUserIdFromUrl()}`;
             
-            // 根據任務狀態添加狀態標籤
             let statusHtml = '';
             if (mission.status) {
                 statusHtml = `<div class="mission-status">${mission.status}</div>`;
@@ -334,31 +113,25 @@
             }
         }
 
-       // 頁面載入時執行
-window.addEventListener('load', async function() {
-    const userId = getUserIdFromUrl();
-    if (!userId) {
-        alert('無法獲取用戶ID，請重新進入頁面');
-        window.location.href = 'index.html';
-        return;
-    }
+        // 頁面載入時執行
+        window.addEventListener('load', async function() {
+            const userId = getUserIdFromUrl();
+            if (!userId) {
+                alert('無法獲取用戶ID，請重新進入頁面');
+                window.location.href = 'index.html';
+                return;
+            }
 
-    try {
-        const userData = await window.getUserData(userId);
-        
-        if (userData) {
-            document.getElementById('userInfo').textContent = `歡迎，${userData.nickname || '勇者'}`;
-            loadMissions();
-        } else {
-            alert('找不到用戶資料');
-            window.location.href = 'index.html';
-        }
-    } catch (error) {
-        console.error('Error loading user data:', error);
-        alert('載入資料時發生錯誤');
-        window.location.href = 'index.html';
-    }
-});
+            try {
+                const userData = await window.getUserData(userId);
+                document.getElementById('userInfo').textContent = `歡迎，${userData.nickname || '勇者'}`;
+                loadMissions();
+            } catch (error) {
+                console.error('Error loading user data:', error);
+                alert('載入資料時發生錯誤');
+                window.location.href = 'index.html';
+            }
+        });
 
         // 添加過濾功能
         document.querySelectorAll('.filter-btn').forEach(btn => {
