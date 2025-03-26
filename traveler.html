@@ -414,24 +414,36 @@
             const urlParams = new URLSearchParams(window.location.search);
             return urlParams.get('id');
         }
-
-       // 頁面載入時執行
+// 頁面載入時執行
 window.addEventListener('load', async function() {
     const userId = getUserIdFromUrl();
     if (!userId) {
         alert('無法獲取用戶ID，請重新進入頁面');
-        window.location.href = 'index.html';
         return;
     }
 
     try {
-        const userData = await window.getUserData(userId);
-        document.getElementById('userInfo').textContent = `歡迎，${userData.nickname || '勇者'}`;
-        loadMissions();
+        // 確保 Firebase 已初始化
+        if (!firebase.apps.length) {
+            firebase.initializeApp(window.firebaseConfig);
+        }
+        
+        const db = firebase.firestore();
+        const doc = await db.collection('users').doc(userId).get();
+        
+        if (doc.exists) {
+            const userData = doc.data();
+            // 更新頁面內容
+            document.getElementById('nickname').textContent = userData.nickname || '未設置';
+            document.getElementById('personality').textContent = userData.personality || '未設置';
+            document.getElementById('abilities').textContent = userData.abilities || '未設置';
+            document.getElementById('description').textContent = userData.description || '未設置';
+        } else {
+            alert('找不到用戶資料');
+        }
     } catch (error) {
         console.error('Error loading user data:', error);
         alert('載入資料時發生錯誤');
-        window.location.href = 'index.html';
     }
 });
     </script>
