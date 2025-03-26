@@ -423,8 +423,12 @@ window.addEventListener('load', async function() {
     }
 
     try {
-        // 使用已經初始化好的 window.db
-        const doc = await window.db.collection('users').doc(userId).get();
+        // 確保 Firebase 已初始化
+        if (!firebase.apps.length) {
+            firebase.initializeApp(window.firebaseConfig);
+        }
+        const db = firebase.firestore();
+        const doc = await db.collection('users').doc(userId).get();  // 這行被漏掉了
         
         if (doc.exists) {
             const userData = doc.data();
