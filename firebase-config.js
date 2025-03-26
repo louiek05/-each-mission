@@ -71,7 +71,6 @@ window.updateUserData = async (userId, data) => {
         return false;
     }
 };
-
 // 獲取任務列表
 window.getMissions = async function() {
     try {
