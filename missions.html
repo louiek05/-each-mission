@@ -235,21 +235,56 @@ h1::after {
     </div>
 
     <script>
-        // 從 URL 獲取用戶 ID
-        function getUserIdFromUrl() {
-            const urlParams = new URLSearchParams(window.location.search);
-            return urlParams.get('id');
+     // 返回個人頁面
+function goBack() {
+    const userId = getUserIdFromUrl();
+    const userClass = getUserClassFromUrl(); // 從 URL 獲取用戶職業
+    console.log('當前用戶ID:', userId);
+    console.log('用戶職業:', userClass);
+    
+    if (userId) {
+        let url;
+        switch(userClass) {
+            case 'assassin':
+                url = 'assassin.html';
+                break;
+            case 'craftsman':
+                url = 'craftsman.html';
+                break;
+            case 'traveler':
+                url = 'traveler.html';
+                break;
+            case 'warrior':
+                url = 'warrior.html';
+                break;
+            case 'mage':
+                url = 'mage.html';
+                break;
+            default:
+                url = 'index.html';
         }
+        
+        // 添加用戶 ID 到 URL
+        url += `?id=${encodeURIComponent(userId)}`;
+        console.log('跳轉到:', url);
+        window.location.href = url;
+    } else {
+        console.log('未找到用戶ID，返回首頁');
+        window.location.href = 'index.html';
+    }
+}
 
-        // 返回個人頁面
-        function goBack() {
-            const userId = getUserIdFromUrl();
-            if (userId) {
-                window.location.href = `traveler.html?id=${userId}`;
-            } else {
-                window.location.href = 'index.html';
-            }
-        }
+// 從 URL 獲取用戶 ID
+function getUserIdFromUrl() {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get('id');
+}
+
+// 從 URL 獲取用戶職業
+function getUserClassFromUrl() {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get('class');
+}
 
         // 創建任務卡片
         function createMissionCard(missionId, mission) {
@@ -312,5 +347,4 @@ h1::after {
             loadMissions();
         });
     </script>
-</head>
 </html>
