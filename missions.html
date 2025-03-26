@@ -121,26 +121,24 @@ window.addEventListener('load', async function() {
     if (!userId) {
         console.error('無法獲取用戶ID');
         alert('無法獲取用戶ID，請重新進入頁面');
-        return;  // 不要跳轉到首頁
+        return;
     }
 
     try {
-        console.log('開始獲取用戶資料...');
-        const userData = await window.getUserData(userId);
-        console.log('獲取到的用戶資料:', userData);
+        // 直接載入任務列表
+        console.log('開始載入任務列表...');
+        await loadMissions();
         
-        if (userData) {
-            document.getElementById('userInfo').textContent = `歡迎，${userData.nickname || '勇者'}`;
-            loadMissions();
-        } else {
-            console.error('找不到用戶資料，用戶ID:', userId);
-            alert('找不到用戶資料，請確認用戶ID是否正確');
-            return;  // 不要跳轉到首頁
+        // 如果有用戶ID，顯示歡迎訊息
+        if (userId) {
+            const userData = await window.getUserData(userId);
+            if (userData) {
+                document.getElementById('userInfo').textContent = `歡迎，${userData.nickname || '勇者'}`;
+            }
         }
     } catch (error) {
-        console.error('詳細錯誤信息:', error);
-        alert('載入資料時發生錯誤，請稍後再試');
-        return;  // 不要跳轉到首頁
+        console.error('載入任務列表失敗:', error);
+        alert('載入任務列表時發生錯誤');
     }
 });
         // 添加過濾功能
