@@ -13,18 +13,11 @@ const config = {
 // 確保只初始化一次
 if (typeof window.myFirebaseApp === 'undefined') {
     try {
-        // 初始化 Firebase
+        console.log('開始初始化 Firebase...');
         window.myFirebaseApp = firebase.initializeApp(config);
-        
-        // 初始化 Firestore
         window.db = firebase.firestore();
-        
-        // 初始化 Auth
         window.auth = firebase.auth();
-        
-        // 導出配置供其他檔案使用
         window.firebaseConfig = config;
-        
         console.log('Firebase 初始化成功');
     } catch (error) {
         console.error('Firebase 初始化失敗:', error);
@@ -38,7 +31,9 @@ window.getAuth = () => window.auth;
 // 常用資料庫操作函數
 window.getUserData = async (userId) => {
     try {
+        console.log('正在獲取用戶資料，用戶ID:', userId);
         const doc = await window.db.collection('users').doc(userId).get();
+        console.log('用戶資料獲取結果:', doc.exists);
         return doc.exists ? doc.data() : null;
     } catch (error) {
         console.error('獲取用戶資料失敗:', error);
@@ -77,20 +72,26 @@ window.updateUserData = async (userId, data) => {
     }
 };
 
-       // 獲取任務列表
+// 獲取任務列表
 window.getMissions = async function() {
     try {
-        // 移除登入檢查
+        console.log('開始獲取任務列表...');
         const missionsRef = window.db.collection('missions');
         const snapshot = await missionsRef.get();
+        console.log('獲取到的任務數量:', snapshot.size);
         
-        return snapshot.docs.map(doc => ({
-            id: doc.id,
-            ...doc.data()
-        }));
+        if (!snapshot.empty) {
+            return snapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data()
+            }));
+        } else {
+            console.log('沒有找到任務');
+            return [];
+        }
     } catch (error) {
-        console.error('Error getting missions:', error);
-        throw error;
+        console.error('獲取任務列表失敗:', error);
+        return [];  // 發生錯誤時返回空陣列
     }
 };
 
@@ -151,9 +152,7 @@ window.handleFirebaseError = (error) => {
 window.auth.onAuthStateChanged((user) => {
     if (user) {
         console.log('用戶已登入:', user.email);
-        // 可以在這裡處理登入後的邏輯
     } else {
         console.log('用戶已登出');
-        // 可以在這裡處理登出後的邏輯
     }
 });
