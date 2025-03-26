@@ -113,34 +113,34 @@
             }
         }
 
-       // 頁面載入時執行
+    // 頁面載入時執行
 window.addEventListener('load', async function() {
     const userId = getUserIdFromUrl();
-    console.log('當前用戶ID:', userId); // 添加日誌
+    console.log('當前用戶ID:', userId);
 
     if (!userId) {
-        console.error('無法獲取用戶ID'); // 添加日誌
+        console.error('無法獲取用戶ID');
         alert('無法獲取用戶ID，請重新進入頁面');
-        window.location.href = 'index.html';
-        return;
+        return;  // 不要跳轉到首頁
     }
 
     try {
-        console.log('開始獲取用戶資料...'); // 添加日誌
+        console.log('開始獲取用戶資料...');
         const userData = await window.getUserData(userId);
-        console.log('獲取到的用戶資料:', userData); // 添加日誌
+        console.log('獲取到的用戶資料:', userData);
         
         if (userData) {
             document.getElementById('userInfo').textContent = `歡迎，${userData.nickname || '勇者'}`;
             loadMissions();
         } else {
-            console.error('找不到用戶資料，用戶ID:', userId); // 添加日誌
-            alert('找不到用戶資料');
-            window.location.href = 'index.html';
+            console.error('找不到用戶資料，用戶ID:', userId);
+            alert('找不到用戶資料，請確認用戶ID是否正確');
+            return;  // 不要跳轉到首頁
         }
     } catch (error) {
-        console.error('詳細錯誤信息:', error); // 添加詳細錯誤日誌
-        alert('載入資料時發生錯誤: ' + error.message); // 顯示具體錯誤信息
+        console.error('詳細錯誤信息:', error);
+        alert('載入資料時發生錯誤，請稍後再試');
+        return;  // 不要跳轉到首頁
     }
 });
         // 添加過濾功能
