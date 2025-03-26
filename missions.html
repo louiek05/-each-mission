@@ -1,5 +1,24 @@
 <!DOCTYPE html>
 <html lang="zh">
+    <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>勇者之證 - 任務公佈欄</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600&display=swap" rel="stylesheet">
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+    
+    <!-- 確保 firebase-config.js 在 Firebase SDK 之後載入 -->
+    <script src="firebase-config.js"></script>
+    
+    <!-- 其他樣式保持不變 -->
+    <style>
+        /* ... 你的樣式代碼 ... */
+    </style>
+</head>
 <!-- ... 保持 head 部分和 style 部分不變 ... -->
 <body>
     <button class="back-btn" onclick="goBack()">返回個人頁面</button>
@@ -131,9 +150,14 @@ window.addEventListener('load', async function() {
         
         // 如果有用戶ID，顯示歡迎訊息
         if (userId) {
-            const userData = await window.getUserData(userId);
-            if (userData) {
-                document.getElementById('userInfo').textContent = `歡迎，${userData.nickname || '勇者'}`;
+            try {
+                const userData = await window.getUserData(userId);
+                if (userData) {
+                    document.getElementById('userInfo').textContent = `歡迎，${userData.nickname || '勇者'}`;
+                }
+            } catch (userError) {
+                console.error('獲取用戶資料失敗:', userError);
+                document.getElementById('userInfo').textContent = '歡迎，勇者';
             }
         }
     } catch (error) {
