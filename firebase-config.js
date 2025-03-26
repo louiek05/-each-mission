@@ -24,10 +24,6 @@ if (typeof window.myFirebaseApp === 'undefined') {
     }
 }
 
-// 導出常用函數
-window.getFirestore = () => window.db;
-window.getAuth = () => window.auth;
-
 // 常用資料庫操作函數
 window.getUserData = async (userId) => {
     try {
@@ -71,6 +67,7 @@ window.updateUserData = async (userId, data) => {
         return false;
     }
 };
+
 // 獲取任務列表
 window.getMissions = async function() {
     try {
