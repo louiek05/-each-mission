@@ -113,26 +113,36 @@
             }
         }
 
-        // 頁面載入時執行
-        window.addEventListener('load', async function() {
-            const userId = getUserIdFromUrl();
-            if (!userId) {
-                alert('無法獲取用戶ID，請重新進入頁面');
-                window.location.href = 'index.html';
-                return;
-            }
+       // 頁面載入時執行
+window.addEventListener('load', async function() {
+    const userId = getUserIdFromUrl();
+    console.log('當前用戶ID:', userId); // 添加日誌
 
-            try {
-                const userData = await window.getUserData(userId);
-                document.getElementById('userInfo').textContent = `歡迎，${userData.nickname || '勇者'}`;
-                loadMissions();
-            } catch (error) {
-                console.error('Error loading user data:', error);
-                alert('載入資料時發生錯誤');
-                window.location.href = 'index.html';
-            }
-        });
+    if (!userId) {
+        console.error('無法獲取用戶ID'); // 添加日誌
+        alert('無法獲取用戶ID，請重新進入頁面');
+        window.location.href = 'index.html';
+        return;
+    }
 
+    try {
+        console.log('開始獲取用戶資料...'); // 添加日誌
+        const userData = await window.getUserData(userId);
+        console.log('獲取到的用戶資料:', userData); // 添加日誌
+        
+        if (userData) {
+            document.getElementById('userInfo').textContent = `歡迎，${userData.nickname || '勇者'}`;
+            loadMissions();
+        } else {
+            console.error('找不到用戶資料，用戶ID:', userId); // 添加日誌
+            alert('找不到用戶資料');
+            window.location.href = 'index.html';
+        }
+    } catch (error) {
+        console.error('詳細錯誤信息:', error); // 添加詳細錯誤日誌
+        alert('載入資料時發生錯誤: ' + error.message); // 顯示具體錯誤信息
+    }
+});
         // 添加過濾功能
         document.querySelectorAll('.filter-btn').forEach(btn => {
             btn.addEventListener('click', function() {
