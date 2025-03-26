@@ -286,37 +286,39 @@ function getUserClassFromUrl() {
     return urlParams.get('class');
 }
 
-        // 創建任務卡片
-        function createMissionCard(missionId, mission) {
-            const card = document.createElement('div');
-            card.className = 'mission-card';
-            card.onclick = () => window.location.href = `mission-detail.html?id=${missionId}&userId=${getUserIdFromUrl()}`;
-            
-            // 添加任務狀態樣式
-            let statusHtml = '';
-            if (mission.status) {
-                const statusClass = mission.status === '可接取' ? 'status-available' : 'status-unavailable';
-                statusHtml = `<div class="mission-status ${statusClass}">${mission.status}</div>`;
-            }
-            
-            card.innerHTML = `
-                ${statusHtml}
-                <div class="mission-info">
-                    <div>
-                        <div class="mission-title">${mission.title || '未命名任務'}</div>
-                        <div class="mission-description">${mission.description || '無描述'}</div>
-                    </div>
-                    <div class="mission-details">
-                        報酬: ${mission.reward || '0'}金幣<br>
-                        發布者: ${mission.publisher || '未知'}<br>
-                        時限: ${mission.deadline || '無限制'}
-                    </div>
-                </div>
-                <img src="${mission.image || 'path/to/default-mission-image.jpg'}" alt="任務圖片" class="mission-image" onerror="this.src='path/to/default-mission-image.jpg'">
-            `;
-            
-            return card;
-        }
+      // 創建任務卡片
+function createMissionCard(missionId, mission) {
+    const card = document.createElement('div');
+    card.className = 'mission-card';
+    const userId = getUserIdFromUrl();
+    const userClass = getUserClassFromUrl();
+    card.onclick = () => window.location.href = `mission-detail.html?id=${missionId}&userId=${userId}&class=${userClass}`;
+    
+    // 添加任務狀態樣式
+    let statusHtml = '';
+    if (mission.status) {
+        const statusClass = mission.status === '可接取' ? 'status-available' : 'status-unavailable';
+        statusHtml = `<div class="mission-status ${statusClass}">${mission.status}</div>`;
+    }
+    
+    card.innerHTML = `
+        ${statusHtml}
+        <div class="mission-info">
+            <div>
+                <div class="mission-title">${mission.title || '未命名任務'}</div>
+                <div class="mission-description">${mission.description || '無描述'}</div>
+            </div>
+            <div class="mission-details">
+                報酬: ${mission.reward || '0'}金幣<br>
+                發布者: ${mission.publisher || '未知'}<br>
+                時限: ${mission.deadline || '無限制'}
+            </div>
+        </div>
+        <img src="${mission.image || 'path/to/default-mission-image.jpg'}" alt="任務圖片" class="mission-image" onerror="this.src='path/to/default-mission-image.jpg'">
+    `;
+    
+    return card;
+}
 
         // 載入任務列表
         async function loadMissions() {
