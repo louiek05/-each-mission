@@ -11,10 +11,10 @@ const config = {
 };
 
 // 確保只初始化一次
-if (typeof window.myFirebaseApp === 'undefined') {
+if (!firebase.apps.length) {
     try {
         console.log('開始初始化 Firebase...');
-        window.myFirebaseApp = firebase.initializeApp(config);
+        firebase.initializeApp(config);
         window.db = firebase.firestore();
         window.auth = firebase.auth();
         console.log('Firebase 初始化成功');
