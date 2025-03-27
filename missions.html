@@ -14,226 +14,246 @@
     
     <style>
         body {
-            margin: 0;
-            min-height: 100vh;
-            background: radial-gradient(circle at center,
-                #FAEBD7 0%,
-                #A0522D 70%,
-                #8B4513 100%
-            );
-            font-family: 'Noto Serif TC', serif;
-            color: #fff;
-            padding: 20px;
-        }
+    margin: 0;
+    min-height: 100vh;
+    background: radial-gradient(circle at center,
+        #FAEBD7 0%,
+        #A0522D 70%,
+        #8B4513 100%
+    );
+    font-family: 'Noto Serif TC', serif;
+    color: #fff;
+    padding: 20px;
+}
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
 
-        h1 {
-            text-align: center;
-            color: #FFD700;
-            margin-bottom: 30px;
-            font-size: 2.5em;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-            position: relative;
-            display: block;
-            width: 100%;
-            text-align: center;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
+h1 {
+    text-align: center;
+    color: #FFD700;
+    margin-bottom: 30px;
+    font-size: 2.5em;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    position: relative;
+    display: block;
+    width: 100%;
+    text-align: center;
+    margin: 0 auto;
+    padding: 0 20px;
+}
 
-        h1::after {
-            content: '';
-            position: absolute;
-            bottom: -10px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 100px;
-            height: 3px;
-            background: linear-gradient(to right, transparent, #FFD700, transparent);
-        }
+h1::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100px;
+    height: 3px;
+    background: linear-gradient(to right, transparent, #FFD700, transparent);
+}
 
-        .missions-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 25px;
-            padding: 20px;
-        }
+.missions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 25px;
+    padding: 20px;
+}
 
-        .mission-card {
-            background: rgba(139, 69, 19, 0.95);
-            border-radius: 20px;
-            overflow: hidden;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            cursor: pointer;
-            border: 3px solid #DEB887;
-            display: flex;
-            height: 220px;
-            position: relative;
-            backdrop-filter: blur(5px);
-        }
+.mission-card {
+    background: rgba(139, 69, 19, 0.95);
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    border: 3px solid #DEB887;
+    display: flex;
+    height: 220px;
+    position: relative;
+    backdrop-filter: blur(5px);
+}
 
-        .mission-card:hover {
-            transform: translateY(-8px) scale(1.02);
-            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.4);
-            border-color: #FFD700;
-        }
+.mission-card:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.4);
+    border-color: #FFD700;
+}
 
-        .mission-status {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 0.9em;
-            font-weight: bold;
-            z-index: 1;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
+.mission-status {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.9em;
+    font-weight: bold;
+    z-index: 1;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
 
-        .status-available {
-            background: linear-gradient(135deg, #4CAF50, #45a049);
-            color: white;
-            border: 2px solid #45a049;
-        }
+.status-available {
+    background: linear-gradient(135deg, #4CAF50, #45a049);
+    color: white;
+    border: 2px solid #45a049;
+}
 
-        .status-unavailable {
-            background: linear-gradient(135deg, #f44336, #da190b);
-            color: white;
-            border: 2px solid #da190b;
-        }
+.status-unavailable {
+    background: linear-gradient(135deg, #f44336, #da190b);
+    color: white;
+    border: 2px solid #da190b;
+}
 
-        .status-accepted {
-            background: linear-gradient(135deg, #FFA500, #FF8C00);
-            color: white;
-            border: 2px solid #FF8C00;
-        }
+.status-accepted {
+    background: linear-gradient(135deg, #FFA500, #FF8C00);
+    color: white;
+    border: 2px solid #FF8C00;
+}
 
-        .mission-info {
-            padding: 20px;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            background: linear-gradient(to right, rgba(139, 69, 19, 0.95), rgba(139, 69, 19, 0.8));
-        }
+.mission-info {
+    padding: 20px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background: linear-gradient(to right, rgba(139, 69, 19, 0.95), rgba(139, 69, 19, 0.8));
+}
 
-        .mission-title {
-            color: #FFD700;
-            font-size: 1.4em;
-            margin-bottom: 12px;
-            font-weight: bold;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
-            line-height: 1.3;
-        }
+.mission-title {
+    color: #FFD700;
+    font-size: 1.4em;
+    margin-bottom: 12px;
+    font-weight: bold;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+    line-height: 1.3;
+}
 
-        .mission-description {
-            color: #FFE4B5;
-            font-size: 1.1em;
-            line-height: 1.5;
-            flex-grow: 1;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            display: -webkit-box;
-            -webkit-line-clamp: 3;
-            -webkit-box-orient: vertical;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
-        }
+.mission-description {
+    color: #FFE4B5;
+    font-size: 1.1em;
+    line-height: 1.5;
+    flex-grow: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+}
 
-        .mission-details {
-            color: #DEB887;
-            font-size: 1em;
-            margin-top: 15px;
-            padding-top: 15px;
-            border-top: 2px solid rgba(222, 184, 135, 0.3);
-            line-height: 1.6;
-        }
+.mission-details {
+    color: #DEB887;
+    font-size: 1em;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 2px solid rgba(222, 184, 135, 0.3);
+    line-height: 1.6;
+}
 
-        .mission-image {
-            width: 160px;
-            height: 100%;
-            object-fit: cover;
-            border-left: 3px solid #DEB887;
-            transition: transform 0.4s ease;
-        }
+.mission-avatar {
+    width: 160px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(139, 69, 19, 0.8);
+    border-left: 3px solid #DEB887;
+    padding: 20px;
+}
 
-        .mission-card:hover .mission-image {
-            transform: scale(1.1);
-        }
+.mission-image {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #FFD700;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    transition: transform 0.4s ease;
+}
 
-        .back-btn {
-            position: fixed;
-            bottom: 25px;
-            right: 25px;
-            background: linear-gradient(135deg, #8B4513, #A0522D);
-            color: #FFD700;
-            border: 2px solid #DEB887;
-            padding: 12px 25px;
-            border-radius: 25px;
-            cursor: pointer;
-            font-family: 'Noto Serif TC', serif;
-            font-weight: 600;
-            font-size: 1.1em;
-            transition: all 0.3s ease;
-            z-index: 1000;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
-        }
+.mission-card:hover .mission-image {
+    transform: scale(1.1);
+    border-color: #FFA500;
+}
 
-        .back-btn:hover {
-            background: linear-gradient(135deg, #A0522D, #8B4513);
-            transform: translateY(-2px) scale(1.05);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
-            border-color: #FFD700;
-        }
+.back-btn {
+    position: fixed;
+    bottom: 25px;
+    right: 25px;
+    background: linear-gradient(135deg, #8B4513, #A0522D);
+    color: #FFD700;
+    border: 2px solid #DEB887;
+    padding: 12px 25px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-family: 'Noto Serif TC', serif;
+    font-weight: 600;
+    font-size: 1.1em;
+    transition: all 0.3s ease;
+    z-index: 1000;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+}
 
-        .loading-message {
-            text-align: center;
-            color: #FFD700;
-            font-size: 1.3em;
-            padding: 30px;
-            grid-column: 1 / -1;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
-            animation: pulse 1.5s infinite;
-        }
+.back-btn:hover {
+    background: linear-gradient(135deg, #A0522D, #8B4513);
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+    border-color: #FFD700;
+}
 
-        @keyframes pulse {
-            0% { opacity: 0.6; }
-            50% { opacity: 1; }
-            100% { opacity: 0.6; }
-        }
+.loading-message {
+    text-align: center;
+    color: #FFD700;
+    font-size: 1.3em;
+    padding: 30px;
+    grid-column: 1 / -1;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+    animation: pulse 1.5s infinite;
+}
 
-        @media (max-width: 768px) {
-            .missions-grid {
-                grid-template-columns: 1fr;
-                gap: 20px;
-            }
-            
-            .mission-card {
-                height: auto;
-                flex-direction: column;
-            }
-            
-            .mission-image {
-                width: 100%;
-                height: 200px;
-                border-left: none;
-                border-bottom: 3px solid #DEB887;
-            }
-            
-            .back-btn {
-                bottom: 15px;
-                right: 15px;
-                padding: 8px 20px;
-            }
-        }
+@keyframes pulse {
+    0% { opacity: 0.6; }
+    50% { opacity: 1; }
+    100% { opacity: 0.6; }
+}
+
+@media (max-width: 768px) {
+    .missions-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .mission-card {
+        height: auto;
+        flex-direction: column;
+    }
+    
+    .mission-avatar {
+        width: 100%;
+        height: 160px;
+        border-left: none;
+        border-bottom: 3px solid #DEB887;
+        padding: 15px;
+    }
+    
+    .mission-image {
+        width: 100px;
+        height: 100px;
+    }
+    
+    .back-btn {
+        bottom: 15px;
+        right: 15px;
+        padding: 8px 20px;
+    }
+}
     </style>
 </head>
 <body>
@@ -297,69 +317,93 @@
         }
 
         // 創建任務卡片
-        function createMissionCard(missionId, mission) {
-            const card = document.createElement('div');
-            card.className = 'mission-card';
-            const userId = getUserIdFromUrl();
-            
-            card.onclick = async () => {
-                try {
-                    // 檢查任務是否已被接取
-                    if (mission.status !== '可接取') {
-                        alert('此任務已被接取');
-                        return;
-                    }
-                    
-                    // 更新任務狀態
-                    await window.db.collection('missions').doc(missionId).update({
-                        status: '已接取',
-                        acceptedBy: userId,
-                        acceptedAt: firebase.firestore.FieldValue.serverTimestamp()
-                    });
-                    
-                    alert('接取任務成功！');
-                    loadMissions(); // 重新載入任務列表
-                } catch (error) {
-                    console.error('接取任務失敗:', error);
-                    alert('接取任務時發生錯誤');
-                }
-            };
-            
-            // 添加任務狀態樣式
-            let statusHtml = '';
-            if (mission.status) {
-                let statusClass;
-                switch(mission.status) {
-                    case '可接取':
-                        statusClass = 'status-available';
-                        break;
-                    case '已接取':
-                        statusClass = 'status-accepted';
-                        break;
-                    default:
-                        statusClass = 'status-unavailable';
-                }
-                statusHtml = `<div class="mission-status ${statusClass}">${mission.status}</div>`;
+function createMissionCard(missionId, mission) {
+    const card = document.createElement('div');
+    card.className = 'mission-card';
+    const userId = getUserIdFromUrl();
+    
+    card.onclick = async () => {
+        try {
+            // 檢查任務是否已被接取
+            if (mission.status !== '可接取') {
+                alert('此任務已被接取');
+                return;
             }
             
-            card.innerHTML = `
-                ${statusHtml}
-                <div class="mission-info">
-                    <div>
-                        <div class="mission-title">${mission.title || '未命名任務'}</div>
-                        <div class="mission-description">${mission.description || '無描述'}</div>
-                    </div>
-                    <div class="mission-details">
-                        報酬: ${mission.reward || '0'}金幣<br>
-                        發布者: ${mission.publisher || '未知'}<br>
-                        時限: ${mission.deadline || '無限制'}
-                    </div>
-                </div>
-                <img src="${mission.image || 'images/default-mission.jpg'}" alt="任務圖片" class="mission-image" onerror="this.src='images/default-mission.jpg'">
-            `;
+            // 更新任務狀態
+            await window.db.collection('missions').doc(missionId).update({
+                status: '已接取',
+                acceptedBy: userId,
+                acceptedAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
             
-            return card;
+            alert('接取任務成功！');
+            loadMissions(); // 重新載入任務列表
+        } catch (error) {
+            console.error('接取任務失敗:', error);
+            alert('接取任務時發生錯誤');
         }
+    };
+    
+    // 添加任務狀態樣式
+    let statusHtml = '';
+    if (mission.status) {
+        let statusClass;
+        switch(mission.status) {
+            case '可接取':
+                statusClass = 'status-available';
+                break;
+            case '已接取':
+                statusClass = 'status-accepted';
+                break;
+            default:
+                statusClass = 'status-unavailable';
+        }
+        statusHtml = `<div class="mission-status ${statusClass}">${mission.status}</div>`;
+    }
+    
+    // 根據職業選擇對應的頭像
+    let avatarImage = 'images/default-avatar.jpg';
+    if (mission.userClass) {
+        switch(mission.userClass) {
+            case 'warrior':
+                avatarImage = 'images/warrior-avatar.jpg';
+                break;
+            case 'mage':
+                avatarImage = 'images/mage-avatar.jpg';
+                break;
+            case 'assassin':
+                avatarImage = 'images/assassin-avatar.jpg';
+                break;
+            case 'craftsman':
+                avatarImage = 'images/craftsman-avatar.jpg';
+                break;
+            case 'traveler':
+                avatarImage = 'images/traveler-avatar.jpg';
+                break;
+        }
+    }
+    
+    card.innerHTML = `
+        ${statusHtml}
+        <div class="mission-info">
+            <div>
+                <div class="mission-title">${mission.title || '未命名任務'}</div>
+                <div class="mission-description">${mission.description || '無描述'}</div>
+            </div>
+            <div class="mission-details">
+                報酬: ${mission.reward || '0'}金幣<br>
+                發布者: ${mission.publisher || '未知'}<br>
+                時限: ${mission.deadline || '無限制'}
+            </div>
+        </div>
+        <div class="mission-avatar">
+            <img src="${avatarImage}" alt="發布者頭像" class="mission-image" onerror="this.src='images/default-avatar.jpg'">
+        </div>
+    `;
+    
+    return card;
+}
 
         // 載入任務列表
         async function loadMissions() {
