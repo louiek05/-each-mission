@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>任務詳情 - 勇者之證</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600&display=swap" rel="stylesheet">
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    
+    <style>
+        /* 使用與 missions.html 相同的基礎樣式 */
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: radial-gradient(circle at center,
+                #FAEBD7 0%,
+                #A0522D 70%,
+                #8B4513 100%
+            );
+            font-family: 'Noto Serif TC', serif;
+            color: #fff;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .mission-detail {
+            background: rgba(139, 69, 19, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 3px solid #DEB887;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+        }
+
+        .mission-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .mission-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            margin-right: 20px;
+            border: 3px solid #FFD700;
+        }
+
+        .mission-info {
+            flex: 1;
+        }
+
+        .mission-title {
+            color: #FFD700;
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .mission-description {
+            color: #FFE4B5;
+            font-size: 1.2em;
+            line-height: 1.6;
+        }
+
+        .mission-meta {
+            color: #DEB887;
+            margin-top: 15px;
+        }
+
+        .comments-section {
+            background: rgba(139, 69, 19, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            border: 3px solid #DEB887;
+        }
+
+        .comment-form {
+            margin-bottom: 30px;
+        }
+
+        .comment-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #DEB887;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.9);
+            color: #8B4513;
+            font-size: 16px;
+            margin-bottom: 15px;
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .submit-comment {
+            background: linear-gradient(135deg, #8B4513, #A0522D);
+            color: #FFD700;
+            border: 2px solid #DEB887;
+            padding: 12px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .submit-comment:hover {
+            background: linear-gradient(135deg, #A0522D, #8B4513);
+            transform: translateY(-2px);
+        }
+
+        .comments-list {
+            margin-top: 30px;
+        }
+
+        .comment {
+            background: rgba(222, 184, 135, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid #DEB887;
+        }
+
+        .comment-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .comment-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+
+        .comment-author {
+            color: #FFD700;
+            font-weight: bold;
+        }
+
+        .comment-content {
+            color: #FFE4B5;
+            line-height: 1.5;
+        }
+
+        .back-btn {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            background: linear-gradient(135deg, #8B4513, #A0522D);
+            color: #FFD700;
+            border: 2px solid #DEB887;
+            padding: 12px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-family: 'Noto Serif TC', serif;
+            font-weight: 600;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .back-btn:hover {
+            background: linear-gradient(135deg, #A0522D, #8B4513);
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="mission-detail" id="missionDetail">
+            <div class="loading-message">載入中...</div>
+        </div>
+        
+        <div class="comments-section">
+            <h2>留言區</h2>
+            <form class="comment-form" id="commentForm">
+                <textarea class="comment-input" placeholder="寫下你的留言..." required></textarea>
+                <button type="submit" class="submit-comment">發表留言</button>
+            </form>
+            <div class="comments-list" id="commentsList">
+                <div class="loading-message">載入留言中...</div>
+            </div>
+        </div>
+    </div>
+
+    <button class="back-btn" onclick="goBack()">返回任務列表</button>
+
+    <script>
+        // 獲取URL參數
+        function getUrlParams() {
+            const params = new URLSearchParams(window.location.search);
+            return {
+                missionId: params.get('id'),
+                userId: params.get('userId'),
+                userClass: params.get('class')
+            };
+        }
+
+        // 返回任務列表
+        function goBack() {
+            const { userId, userClass } = getUrlParams();
+            window.location.href = `missions.html?id=${userId}&class=${userClass}`;
+        }
+
+        // 載入任務詳情
+        async function loadMissionDetail() {
+            const { missionId } = getUrlParams();
+            const missionDetail = document.getElementById('missionDetail');
+            
+            try {
+                const missionDoc = await window.db.collection('missions').doc(missionId).get();
+                const mission = missionDoc.data();
+                
+                if (!mission) {
+                    missionDetail.innerHTML = '<div class="loading-message">找不到此任務</div>';
+                    return;
+                }
+
+                // 獲取發布者信息
+                const publisherDoc = await window.db.collection('users').doc(mission.userId).get();
+                const publisherData = publisherDoc.data();
+                
+                // 根據職業選擇頭像
+                let avatarImage = 'images/default-avatar.jpg';
+                if (mission.userClass) {
+                    switch(mission.userClass) {
+                        case 'warrior': avatarImage = 'images/warrior-avatar.jpg'; break;
+                        case 'mage': avatarImage = 'images/mage-avatar.jpg'; break;
+                        case 'assassin': avatarImage = 'images/assassin-avatar.jpg'; break;
+                        case 'craftsman': avatarImage = 'images/craftsman-avatar.jpg'; break;
+                        case 'traveler': avatarImage = 'images/traveler-avatar.jpg'; break;
+                    }
+                }
+
+                missionDetail.innerHTML = `
+                    <div class="mission-header">
+                        <img src="${avatarImage}" alt="發布者頭像" class="mission-avatar">
+                        <div class="mission-info">
+                            <h1 class="mission-title">${mission.title}</h1>
+                            <div class="mission-description">${mission.description}</div>
+                            <div class="mission-meta">
+                                發布者: ${publisherData.nickname || '未知'}<br>
+                                報酬: ${mission.reward}金幣<br>
+                                截止日期: ${mission.deadline}<br>
+                                狀態: ${mission.status}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } catch (error) {
+                console.error('Error loading mission:', error);
+                missionDetail.innerHTML = '<div class="loading-message">載入任務時發生錯誤</div>';
+            }
+        }
+
+        // 載入留言
+        async function loadComments() {
+            const { missionId } = getUrlParams();
+            const commentsList = document.getElementById('commentsList');
+            
+            try {
+                const commentsSnapshot = await window.db.collection('missions')
+                    .doc(missionId)
+                    .collection('comments')
+                    .orderBy('createdAt', 'desc')
+                    .get();
+
+                if (commentsSnapshot.empty) {
+                    commentsList.innerHTML = '<div class="loading-message">目前沒有留言</div>';
+                    return;
+                }
+
+                commentsList.innerHTML = '';
+                commentsSnapshot.forEach(doc => {
+                    const comment = doc.data();
+                    const commentElement = document.createElement('div');
+                    commentElement.className = 'comment';
+                    commentElement.innerHTML = `
+                        <div class="comment-header">
+                            <img src="images/${comment.userClass}-avatar.jpg" alt="用戶頭像" class="comment-avatar">
+                            <span class="comment-author">${comment.author}</span>
+                        </div>
+                        <div class="comment-content">${comment.content}</div>
+                    `;
+                    commentsList.appendChild(commentElement);
+                });
+            } catch (error) {
+                console.error('Error loading comments:', error);
+                commentsList.innerHTML = '<div class="loading-message">載入留言時發生錯誤</div>';
+            }
+        }
+
+        // 提交留言
+        document.getElementById('commentForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const { missionId, userId, userClass } = getUrlParams();
+            const commentInput = this.querySelector('.comment-input');
+            const content = commentInput.value.trim();
+
+            if (!content) return;
+
+            try {
+                // 獲取用戶信息
+                const userDoc = await window.db.collection('users').doc(userId).get();
+                const userData = userDoc.data();
+
+                // 添加留言
+                await window.db.collection('missions')
+                    .doc(missionId)
+                    .collection('comments')
+                    .add({
+                        content: content,
+                        author: userData.nickname || '未知用戶',
+                        userClass: userClass,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+
+                commentInput.value = '';
+                loadComments();
+            } catch (error) {
+                console.error('Error posting comment:', error);
+                alert('發表留言時發生錯誤');
+            }
+        });
+
+        // 頁面載入時執行
+        document.addEventListener('DOMContentLoaded', function() {
+            loadMissionDetail();
+            loadComments();
+        });
+    </script>
+</body>
+</html>
