@@ -16,13 +16,52 @@ if (typeof window.myFirebaseApp === 'undefined') {
         console.log('開始初始化 Firebase...');
         window.myFirebaseApp = firebase.initializeApp(config);
         window.db = firebase.firestore();
-        window.auth = firebase.auth();  // 添加 auth 實例
+        window.auth = firebase.auth();
         console.log('Firebase 初始化成功');
     } catch (error) {
         console.error('Firebase 初始化失敗:', error);
     }
 }
 
+// 發布新任務
+window.createMission = async function(missionData) {
+    try {
+        console.log('開始創建任務...');
+        const missionRef = await window.db.collection('missions').add({
+            ...missionData,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+            status: '可接取'
+        });
+        console.log('任務創建成功，ID:', missionRef.id);
+        return missionRef.id;
+    } catch (error) {
+        console.error('創建任務失敗:', error);
+        throw error;
+    }
+};
+
+// 獲取用戶發布的任務
+window.getUserMissions = async function(userId) {
+    try {
+        console.log('開始獲取用戶任務...');
+        const missionsRef = window.db.collection('missions').where('userId', '==', userId);
+        const snapshot = await missionsRef.get();
+        console.log('獲取到的用戶任務數量:', snapshot.size);
+        
+        if (!snapshot.empty) {
+            return snapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data()
+            }));
+        } else {
+            console.log('沒有找到用戶任務');
+            return [];
+        }
+    } catch (error) {
+        console.error('獲取用戶任務失敗:', error);
+        return [];
+    }
+};
 // 註冊新用戶
 window.registerUser = async function(email, password, nickname, userClass) {
     try {
