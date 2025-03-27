@@ -8,6 +8,7 @@
     
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
     <script src="firebase-config.js"></script>
     
@@ -31,19 +32,19 @@
             padding: 20px;
         }
 
-       h1 {
-    text-align: center;
-    color: #FFD700;
-    margin-bottom: 30px;
-    font-size: 2.5em;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-    position: relative;
-    display: block;  /* 改為 block */
-    width: 100%;     /* 添加寬度 100% */
-    text-align: center;  /* 確保文字置中 */
-    margin: 0 auto;      /* 確保區塊置中 */
-    padding: 0 20px;     /* 添加左右內邊距 */
-}
+        h1 {
+            text-align: center;
+            color: #FFD700;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            position: relative;
+            display: block;
+            width: 100%;
+            text-align: center;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
 
         h1::after {
             content: '';
@@ -109,6 +110,12 @@
             border: 2px solid #da190b;
         }
 
+        .status-accepted {
+            background: linear-gradient(135deg, #FFA500, #FF8C00);
+            color: white;
+            border: 2px solid #FF8C00;
+        }
+
         .mission-info {
             padding: 20px;
             flex: 1;
@@ -162,23 +169,23 @@
         }
 
         .back-btn {
-    position: fixed;
-    bottom: 25px;    /* 改為 bottom */
-    right: 25px;     /* 改為 right */
-    background: linear-gradient(135deg, #8B4513, #A0522D);
-    color: #FFD700;
-    border: 2px solid #DEB887;
-    padding: 12px 25px;
-    border-radius: 25px;
-    cursor: pointer;
-    font-family: 'Noto Serif TC', serif;
-    font-weight: 600;
-    font-size: 1.1em;
-    transition: all 0.3s ease;
-    z-index: 1000;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
-}
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            background: linear-gradient(135deg, #8B4513, #A0522D);
+            color: #FFD700;
+            border: 2px solid #DEB887;
+            padding: 12px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-family: 'Noto Serif TC', serif;
+            font-weight: 600;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        }
 
         .back-btn:hover {
             background: linear-gradient(135deg, #A0522D, #8B4513);
@@ -203,7 +210,6 @@
             100% { opacity: 0.6; }
         }
 
-        /* 響應式設計 */
         @media (max-width: 768px) {
             .missions-grid {
                 grid-template-columns: 1fr;
@@ -223,11 +229,11 @@
             }
             
             .back-btn {
-        bottom: 15px;    /* 改為 bottom */
-        right: 15px;     /* 改為 right */
-        padding: 8px 20px;
-    }
-}
+                bottom: 15px;
+                right: 15px;
+                padding: 8px 20px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -243,7 +249,7 @@
         // 返回個人頁面
         function goBack() {
             const userId = getUserIdFromUrl();
-            const userClass = getUserClassFromUrl(); // 從 URL 獲取用戶職業
+            const userClass = getUserClassFromUrl();
             console.log('當前用戶ID:', userId);
             console.log('用戶職業:', userClass);
             
@@ -269,7 +275,6 @@
                         url = 'index.html';
                 }
                 
-                // 添加用戶 ID 到 URL
                 url += `?id=${encodeURIComponent(userId)}`;
                 console.log('跳轉到:', url);
                 window.location.href = url;
@@ -296,24 +301,44 @@
             const card = document.createElement('div');
             card.className = 'mission-card';
             const userId = getUserIdFromUrl();
-            const userClass = getUserClassFromUrl();
-            // 修改這裡，直接顯示任務詳情
-            card.onclick = () => {
-                // 顯示任務詳情
-                alert(`
-                    任務名稱：${mission.title || '未命名任務'}
-                    任務描述：${mission.description || '無描述'}
-                    報酬：${mission.reward || '0'}金幣
-                    發布者：${mission.publisher || '未知'}
-                    時限：${mission.deadline || '無限制'}
-                    狀態：${mission.status || '未知'}
-                `);
+            
+            card.onclick = async () => {
+                try {
+                    // 檢查任務是否已被接取
+                    if (mission.status !== '可接取') {
+                        alert('此任務已被接取');
+                        return;
+                    }
+                    
+                    // 更新任務狀態
+                    await window.db.collection('missions').doc(missionId).update({
+                        status: '已接取',
+                        acceptedBy: userId,
+                        acceptedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    
+                    alert('接取任務成功！');
+                    loadMissions(); // 重新載入任務列表
+                } catch (error) {
+                    console.error('接取任務失敗:', error);
+                    alert('接取任務時發生錯誤');
+                }
             };
             
             // 添加任務狀態樣式
             let statusHtml = '';
             if (mission.status) {
-                const statusClass = mission.status === '可接取' ? 'status-available' : 'status-unavailable';
+                let statusClass;
+                switch(mission.status) {
+                    case '可接取':
+                        statusClass = 'status-available';
+                        break;
+                    case '已接取':
+                        statusClass = 'status-accepted';
+                        break;
+                    default:
+                        statusClass = 'status-unavailable';
+                }
                 statusHtml = `<div class="mission-status ${statusClass}">${mission.status}</div>`;
             }
             
@@ -330,7 +355,7 @@
                         時限: ${mission.deadline || '無限制'}
                     </div>
                 </div>
-                <img src="${mission.image || 'path/to/default-mission-image.jpg'}" alt="任務圖片" class="mission-image" onerror="this.src='path/to/default-mission-image.jpg'">
+                <img src="${mission.image || 'images/default-mission.jpg'}" alt="任務圖片" class="mission-image" onerror="this.src='images/default-mission.jpg'">
             `;
             
             return card;
@@ -350,7 +375,15 @@
                 }
                 
                 missionsGrid.innerHTML = '';
-                missions.forEach(mission => {
+                // 只顯示可接取的任務
+                const availableMissions = missions.filter(mission => mission.status === '可接取');
+                
+                if (availableMissions.length === 0) {
+                    missionsGrid.innerHTML = '<div class="loading-message">目前沒有可接的任務</div>';
+                    return;
+                }
+                
+                availableMissions.forEach(mission => {
                     const missionCard = createMissionCard(mission.id, mission);
                     missionsGrid.appendChild(missionCard);
                 });
