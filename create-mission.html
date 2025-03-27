@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>發佈任務 - 勇者之證</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600&display=swap" rel="stylesheet">
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <style>
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: radial-gradient(circle at center,
+                #FAEBD7 0%,
+                #A0522D 70%,
+                #8B4513 100%
+            );
+            font-family: 'Noto Serif TC', serif;
+            color: #fff;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: rgba(139, 69, 19, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+            border: 3px solid #DEB887;
+        }
+
+        .inspiration-text {
+            text-align: center;
+            font-size: 18px;
+            line-height: 1.8;
+            color: #FFE4B5;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(222, 184, 135, 0.1);
+            border-radius: 10px;
+            border: 2px solid #DEB887;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #FFD700;
+            font-weight: bold;
+        }
+
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #DEB887;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.9);
+            color: #8B4513;
+            font-size: 16px;
+        }
+
+        .form-group textarea {
+            height: 150px;
+            resize: vertical;
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, #8B4513, #A0522D);
+            color: #FFD700;
+            border: 2px solid #DEB887;
+            padding: 12px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            width: 100%;
+            font-family: 'Noto Serif TC', serif;
+        }
+
+        .submit-btn:hover {
+            background: linear-gradient(135deg, #A0522D, #8B4513);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .back-btn {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            background: linear-gradient(135deg, #8B4513, #A0522D);
+            color: #FFD700;
+            border: 2px solid #DEB887;
+            padding: 12px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-family: 'Noto Serif TC', serif;
+            font-weight: 600;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .back-btn:hover {
+            background: linear-gradient(135deg, #A0522D, #8B4513);
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+            border-color: #FFD700;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .back-btn {
+                bottom: 15px;
+                right: 15px;
+                padding: 8px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="inspiration-text">
+            想想你最近一直想做的事，或是你曾經想做的事，把這裡當作重新出發的點，寫下來，也許有人跟你有個同樣的夢，也許我們都不該讓自己沉溺墮落。不怕夢很大，就怕你不做。
+        </div>
+
+        <form id="taskForm">
+            <div class="form-group">
+                <label for="title">主標題</label>
+                <input type="text" id="title" placeholder="所以你想要做什麼事？" required>
+            </div>
+            <div class="form-group">
+                <label for="description">子標題</label>
+                <textarea id="description" placeholder="說明你為何想做這件事..." required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="reward">報酬（金幣）</label>
+                <input type="number" id="reward" placeholder="輸入報酬金額" required min="0">
+            </div>
+            <div class="form-group">
+                <label for="deadline">截止日期</label>
+                <input type="date" id="deadline" required>
+            </div>
+            <button type="submit" class="submit-btn">發佈任務</button>
+        </form>
+    </div>
+
+    <button class="back-btn" onclick="goBack()">返回</button>
+
+    <script>
+        // 從 URL 獲取用戶 ID
+        function getUserIdFromUrl() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('id');
+        }
+
+        // 返回上一頁
+        function goBack() {
+            const userId = getUserIdFromUrl();
+            const userClass = new URLSearchParams(window.location.search).get('class');
+            window.location.href = `${userClass}.html?id=${userId}`;
+        }
+
+       // 在發任務網頁的 script 部分修改
+document.getElementById('taskForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const userId = getUserIdFromUrl();
+    const title = document.getElementById('title').value;
+    const description = document.getElementById('description').value;
+    const reward = document.getElementById('reward').value;
+    const deadline = document.getElementById('deadline').value;
+
+    try {
+        // 獲取用戶資料以取得發布者名稱
+        const userDoc = await window.db.collection('users').doc(userId).get();
+        const userData = userDoc.data();
+        const publisher = userData.nickname || '未知用戶';
+
+        // 創建任務數據
+        const missionData = {
+            userId: userId,
+            title: title,
+            description: description,
+            reward: parseInt(reward),
+            publisher: publisher,
+            deadline: deadline
+        };
+
+        // 使用新的 createMission 函數創建任務
+        await window.createMission(missionData);
+
+        alert('任務發佈成功！');
+        document.getElementById('taskForm').reset();
+        
+        // 跳轉到任務公佈欄
+        window.location.href = `missions.html?id=${userId}&class=${new URLSearchParams(window.location.search).get('class')}`;
+    } catch (error) {
+        console.error('Error:', error);
+        alert('發佈任務時發生錯誤');
+    }
+});
+        // 設置截止日期的最小值為今天
+        document.getElementById('deadline').min = new Date().toISOString().split('T')[0];
+    </script>
+</body>
+</html>
