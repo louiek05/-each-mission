@@ -316,33 +316,16 @@ h1::after {
             return urlParams.get('class');
         }
 
-        // 創建任務卡片
+      // 創建任務卡片
 function createMissionCard(missionId, mission) {
     const card = document.createElement('div');
     card.className = 'mission-card';
     const userId = getUserIdFromUrl();
+    const userClass = getUserClassFromUrl();
     
-    card.onclick = async () => {
-        try {
-            // 檢查任務是否已被接取
-            if (mission.status !== '可接取') {
-                alert('此任務已被接取');
-                return;
-            }
-            
-            // 更新任務狀態
-            await window.db.collection('missions').doc(missionId).update({
-                status: '已接取',
-                acceptedBy: userId,
-                acceptedAt: firebase.firestore.FieldValue.serverTimestamp()
-            });
-            
-            alert('接取任務成功！');
-            loadMissions(); // 重新載入任務列表
-        } catch (error) {
-            console.error('接取任務失敗:', error);
-            alert('接取任務時發生錯誤');
-        }
+    card.onclick = () => {
+        // 跳轉到任務詳情頁面
+        window.location.href = `mission-detail.html?id=${missionId}&userId=${userId}&class=${userClass}`;
     };
     
     // 添加任務狀態樣式
@@ -406,36 +389,29 @@ function createMissionCard(missionId, mission) {
 }
 
         // 載入任務列表
-        async function loadMissions() {
-            const missionsGrid = document.querySelector('.missions-grid');
-            missionsGrid.innerHTML = '<div class="loading-message">載入任務中...</div>';
-            
-            try {
-                const missions = await window.getMissions();
-                
-                if (!missions || missions.length === 0) {
-                    missionsGrid.innerHTML = '<div class="loading-message">目前沒有可接的任務</div>';
-                    return;
-                }
-                
-                missionsGrid.innerHTML = '';
-                // 只顯示可接取的任務
-                const availableMissions = missions.filter(mission => mission.status === '可接取');
-                
-                if (availableMissions.length === 0) {
-                    missionsGrid.innerHTML = '<div class="loading-message">目前沒有可接的任務</div>';
-                    return;
-                }
-                
-                availableMissions.forEach(mission => {
-                    const missionCard = createMissionCard(mission.id, mission);
-                    missionsGrid.appendChild(missionCard);
-                });
-            } catch (error) {
-                console.error('Error loading missions:', error);
-                missionsGrid.innerHTML = '<div class="loading-message">載入任務時發生錯誤，請稍後再試</div>';
-            }
+async function loadMissions() {
+    const missionsGrid = document.querySelector('.missions-grid');
+    missionsGrid.innerHTML = '<div class="loading-message">載入任務中...</div>';
+    
+    try {
+        const missions = await window.getMissions();
+        
+        if (!missions || missions.length === 0) {
+            missionsGrid.innerHTML = '<div class="loading-message">目前沒有任務</div>';
+            return;
         }
+        
+        missionsGrid.innerHTML = '';
+        // 顯示所有任務，不再過濾可接取狀態
+        missions.forEach(mission => {
+            const missionCard = createMissionCard(mission.id, mission);
+            missionsGrid.appendChild(missionCard);
+        });
+    } catch (error) {
+        console.error('Error loading missions:', error);
+        missionsGrid.innerHTML = '<div class="loading-message">載入任務時發生錯誤，請稍後再試</div>';
+    }
+}
 
         // 頁面載入時執行
         document.addEventListener('DOMContentLoaded', function() {
