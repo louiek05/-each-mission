@@ -23,15 +23,15 @@
             padding: 20px;
         }
 
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            background: rgba(139, 69, 19, 0.95);
-            border-radius: 20px;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
-            border: 3px solid #DEB887;
-        }
+       .container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 30px;  /* 增加內邊距 */
+    background: rgba(139, 69, 19, 0.95);
+    border-radius: 20px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+    border: 3px solid #DEB887;
+}
 
         .inspiration-text {
             text-align: center;
@@ -46,8 +46,11 @@
         }
 
         .form-group {
-            margin-bottom: 20px;
-        }
+    margin-bottom: 25px;  /* 增加表單元素之間的間距 */
+    width: 90%;  /* 縮短寬度 */
+    margin-left: auto;  /* 置中 */
+    margin-right: auto;  /* 置中 */
+}
 
         .form-group label {
             display: block;
@@ -57,33 +60,30 @@
         }
 
         .form-group input, .form-group textarea {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #DEB887;
-            border-radius: 8px;
-            background: rgba(255, 255, 255, 0.9);
-            color: #8B4513;
-            font-size: 16px;
-        }
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #DEB887;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.9);
+    color: #8B4513;
+    font-size: 16px;
+    box-sizing: border-box;  /* 確保padding不會增加總寬度 */
+}    
 
         .form-group textarea {
             height: 150px;
             resize: vertical;
         }
 
-        .submit-btn {
-            background: linear-gradient(135deg, #8B4513, #A0522D);
-            color: #FFD700;
-            border: 2px solid #DEB887;
-            padding: 12px 30px;
-            border-radius: 25px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: bold;
-            transition: all 0.3s ease;
-            width: 100%;
-            font-family: 'Noto Serif TC', serif;
-        }
+       .submit-btn {
+    width: 90%;  /* 縮短按鈕寬度 */
+    margin: 0 auto;  /* 置中 */
+    display: block;  /* 確保按鈕可以置中 */
+}
+        .inspiration-text {
+    width: 90%;  /* 縮短文字區域寬度 */
+    margin: 0 auto 30px;  /* 置中並保持底部間距 */
+}
 
         .submit-btn:hover {
             background: linear-gradient(135deg, #A0522D, #8B4513);
