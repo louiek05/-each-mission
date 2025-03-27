@@ -136,6 +136,87 @@
                 padding: 8px 20px;
             }
         }
+
+        .my-missions {
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 2px solid #DEB887;
+        }
+
+        .my-missions h2 {
+            color: #FFD700;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+
+        .mission-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .mission-item {
+            background: rgba(139, 69, 19, 0.95);
+            border-radius: 15px;
+            padding: 20px;
+            border: 2px solid #DEB887;
+        }
+
+        .mission-item h3 {
+            color: #FFD700;
+            margin-bottom: 10px;
+        }
+
+        .mission-item p {
+            color: #FFE4B5;
+            margin: 5px 0;
+        }
+
+        .mission-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .edit-btn, .delete-btn {
+            flex: 1;
+            padding: 8px;
+            border-radius: 15px;
+            border: none;
+            cursor: pointer;
+            font-family: 'Noto Serif TC', serif;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .edit-btn {
+            background: linear-gradient(135deg, #FFA500, #FF8C00);
+            color: white;
+        }
+
+        .delete-btn {
+            background: linear-gradient(135deg, #f44336, #da190b);
+            color: white;
+        }
+
+        .edit-btn:hover, .delete-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .edit-form {
+            display: none;
+            margin-top: 15px;
+            padding: 15px;
+            background: rgba(222, 184, 135, 0.1);
+            border-radius: 10px;
+        }
+
+        .edit-form.show {
+            display: block;
+        }
     </style>
 </head>
 <body>
@@ -163,10 +244,16 @@
             </div>
             <button type="submit" class="submit-btn">發佈任務</button>
         </form>
+    <div class="my-missions">
+            <h2>我的任務</h2>
+            <div class="mission-list" id="myMissionsList">
+                <div class="loading-message">載入中...</div>
+            </div>
+        </div>
     </div>
 
     <button class="back-btn" onclick="goBack()">返回</button>
-
+    
     <script>
         // 從 URL 獲取用戶 ID
         function getUserIdFromUrl() {
@@ -221,6 +308,108 @@ document.getElementById('taskForm').addEventListener('submit', async function(e)
 });
         // 設置截止日期的最小值為今天
         document.getElementById('deadline').min = new Date().toISOString().split('T')[0];
+
+         // 載入用戶的任務
+        async function loadMyMissions() {
+            const userId = getUserIdFromUrl();
+            const missionsList = document.getElementById('myMissionsList');
+            
+            try {
+                const missions = await window.getUserMissions(userId);
+                
+                if (!missions || missions.length === 0) {
+                    missionsList.innerHTML = '<div class="loading-message">您還沒有發布任何任務</div>';
+                    return;
+                }
+                
+                missionsList.innerHTML = missions.map(mission => `
+                    <div class="mission-item" data-id="${mission.id}">
+                        <h3>${mission.title}</h3>
+                        <p>${mission.description}</p>
+                        <p>報酬: ${mission.reward}金幣</p>
+                        <p>截止日期: ${mission.deadline}</p>
+                        <p>狀態: ${mission.status}</p>
+                        <div class="mission-actions">
+                            <button class="edit-btn" onclick="showEditForm('${mission.id}')">修改</button>
+                            <button class="delete-btn" onclick="deleteMission('${mission.id}')">刪除</button>
+                        </div>
+                        <div class="edit-form" id="editForm-${mission.id}">
+                            <div class="form-group">
+                                <label>標題</label>
+                                <input type="text" value="${mission.title}" id="edit-title-${mission.id}">
+                            </div>
+                            <div class="form-group">
+                                <label>描述</label>
+                                <textarea id="edit-description-${mission.id}">${mission.description}</textarea>
+                            </div>
+                            <div class="form-group">
+                                <label>報酬</label>
+                                <input type="number" value="${mission.reward}" id="edit-reward-${mission.id}">
+                            </div>
+                            <div class="form-group">
+                                <label>截止日期</label>
+                                <input type="date" value="${mission.deadline}" id="edit-deadline-${mission.id}">
+                            </div>
+                            <button class="submit-btn" onclick="updateMission('${mission.id}')">保存修改</button>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading missions:', error);
+                missionsList.innerHTML = '<div class="loading-message">載入任務時發生錯誤</div>';
+            }
+        }
+
+        // 顯示編輯表單
+        function showEditForm(missionId) {
+            const form = document.getElementById(`editForm-${missionId}`);
+            form.classList.toggle('show');
+        }
+
+        // 更新任務
+        async function updateMission(missionId) {
+            try {
+                const title = document.getElementById(`edit-title-${missionId}`).value;
+                const description = document.getElementById(`edit-description-${missionId}`).value;
+                const reward = document.getElementById(`edit-reward-${missionId}`).value;
+                const deadline = document.getElementById(`edit-deadline-${missionId}`).value;
+
+                await window.db.collection('missions').doc(missionId).update({
+                    title: title,
+                    description: description,
+                    reward: parseInt(reward),
+                    deadline: deadline
+                });
+
+                alert('任務更新成功！');
+                showEditForm(missionId);
+                loadMyMissions();
+            } catch (error) {
+                console.error('Error updating mission:', error);
+                alert('更新任務時發生錯誤');
+            }
+        }
+
+        // 刪除任務
+        async function deleteMission(missionId) {
+            if (!confirm('確定要刪除這個任務嗎？')) {
+                return;
+            }
+
+            try {
+                await window.db.collection('missions').doc(missionId).delete();
+                alert('任務刪除成功！');
+                loadMyMissions();
+            } catch (error) {
+                console.error('Error deleting mission:', error);
+                alert('刪除任務時發生錯誤');
+            }
+        }
+
+        // 頁面載入時執行
+        document.addEventListener('DOMContentLoaded', function() {
+            loadMyMissions();
+        });
     </script>
 </body>
 </html>
