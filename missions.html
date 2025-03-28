@@ -316,7 +316,7 @@ h1::after {
             return urlParams.get('class');
         }
 
-      // 創建任務卡片
+     // 創建任務卡片
 function createMissionCard(missionId, mission) {
     const card = document.createElement('div');
     card.className = 'mission-card';
@@ -332,17 +332,29 @@ function createMissionCard(missionId, mission) {
     let statusHtml = '';
     if (mission.status) {
         let statusClass;
-        switch(mission.status) {
-            case '可接取':
-                statusClass = 'status-available';
-                break;
-            case '已接取':
-                statusClass = 'status-accepted';
-                break;
-            default:
-                statusClass = 'status-unavailable';
+        let statusText = mission.status;
+        
+        // 檢查是否達到人數上限
+        const currentAcceptedCount = mission.acceptedBy ? Object.keys(mission.acceptedBy).length : 0;
+        const maxAcceptedCount = mission.maxAcceptedCount || 1; // 默認最多1人
+        
+        if (currentAcceptedCount >= maxAcceptedCount) {
+            statusClass = 'status-unavailable';
+            statusText = '已額滿';
+        } else {
+            switch(mission.status) {
+                case '可接取':
+                    statusClass = 'status-available';
+                    break;
+                case '已接取':
+                    statusClass = 'status-accepted';
+                    break;
+                default:
+                    statusClass = 'status-unavailable';
+            }
         }
-        statusHtml = `<div class="mission-status ${statusClass}">${mission.status}</div>`;
+        
+        statusHtml = `<div class="mission-status ${statusClass}">${statusText}</div>`;
     }
     
     // 根據職業選擇對應的頭像
@@ -367,6 +379,10 @@ function createMissionCard(missionId, mission) {
         }
     }
     
+    // 計算當前接取人數和上限
+    const currentAcceptedCount = mission.acceptedBy ? Object.keys(mission.acceptedBy).length : 0;
+    const maxAcceptedCount = mission.maxAcceptedCount || 1;
+    
     card.innerHTML = `
         ${statusHtml}
         <div class="mission-info">
@@ -377,7 +393,8 @@ function createMissionCard(missionId, mission) {
             <div class="mission-details">
                 報酬: ${mission.reward || '0'}金幣<br>
                 發布者: ${mission.publisher || '未知'}<br>
-                時限: ${mission.deadline || '無限制'}
+                時限: ${mission.deadline || '無限制'}<br>
+                接取人數: ${currentAcceptedCount}/${maxAcceptedCount}
             </div>
         </div>
         <div class="mission-avatar">
@@ -386,6 +403,7 @@ function createMissionCard(missionId, mission) {
     `;
     
     return card;
+}
 }
 
         // 載入任務列表
