@@ -62,6 +62,7 @@ window.getUserMissions = async function(userId) {
         return [];
     }
 };
+
 // 註冊新用戶
 window.registerUser = async function(email, password, nickname, userClass) {
     try {
