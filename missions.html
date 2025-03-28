@@ -1,440 +1,439 @@
-<!DOCTYPE html>
-<html lang="zh">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>勇者之證 - 任務公佈欄</title>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600&display=swap" rel="stylesheet">
+    <!DOCTYPE html>
+    <html lang="zh">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>勇者之證 - 任務公佈欄</title>
+        <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600&display=swap" rel="stylesheet">
+        
+        <!-- Firebase SDK -->
+        <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+        <script src="firebase-config.js"></script>
+        
+        <style>
+            body {
+        margin: 0;
+        min-height: 100vh;
+        background: radial-gradient(circle at center,
+            #FAEBD7 0%,
+            #A0522D 70%,
+            #8B4513 100%
+        );
+        font-family: 'Noto Serif TC', serif;
+        color: #fff;
+        padding: 20px;
+    }
     
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
-    <script src="firebase-config.js"></script>
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+    }
     
-    <style>
-        body {
-    margin: 0;
-    min-height: 100vh;
-    background: radial-gradient(circle at center,
-        #FAEBD7 0%,
-        #A0522D 70%,
-        #8B4513 100%
-    );
-    font-family: 'Noto Serif TC', serif;
-    color: #fff;
-    padding: 20px;
-}
-
-.container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
-}
-
-h1 {
-    text-align: center;
-    color: #FFD700;
-    margin-bottom: 30px;
-    font-size: 2.5em;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-    position: relative;
-    display: block;
-    width: 100%;
-    text-align: center;
-    margin: 0 auto;
-    padding: 0 20px;
-}
-
-h1::after {
-    content: '';
-    position: absolute;
-    bottom: -10px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 100px;
-    height: 3px;
-    background: linear-gradient(to right, transparent, #FFD700, transparent);
-}
-
-.missions-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 25px;
-    padding: 20px;
-}
-
-.mission-card {
-    background: rgba(139, 69, 19, 0.95);
-    border-radius: 20px;
-    overflow: hidden;
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    cursor: pointer;
-    border: 3px solid #DEB887;
-    display: flex;
-    height: 220px;
-    position: relative;
-    backdrop-filter: blur(5px);
-}
-
-.mission-card:hover {
-    transform: translateY(-8px) scale(1.02);
-    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.4);
-    border-color: #FFD700;
-}
-
-.mission-status {
-    position: absolute;
-    top: 15px;
-    right: 15px;
-    padding: 6px 12px;
-    border-radius: 20px;
-    font-size: 0.9em;
-    font-weight: bold;
-    z-index: 1;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
-
-.status-available {
-    background: linear-gradient(135deg, #4CAF50, #45a049);
-    color: white;
-    border: 2px solid #45a049;
-}
-
-.status-unavailable {
-    background: linear-gradient(135deg, #f44336, #da190b);
-    color: white;
-    border: 2px solid #da190b;
-}
-
-.status-accepted {
-    background: linear-gradient(135deg, #FFA500, #FF8C00);
-    color: white;
-    border: 2px solid #FF8C00;
-}
-
-.mission-info {
-    padding: 20px;
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    background: linear-gradient(to right, rgba(139, 69, 19, 0.95), rgba(139, 69, 19, 0.8));
-}
-
-.mission-title {
-    color: #FFD700;
-    font-size: 1.4em;
-    margin-bottom: 12px;
-    font-weight: bold;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
-    line-height: 1.3;
-}
-
-.mission-description {
-    color: #FFE4B5;
-    font-size: 1.1em;
-    line-height: 1.5;
-    flex-grow: 1;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
-}
-
-.mission-details {
-    color: #DEB887;
-    font-size: 1em;
-    margin-top: 15px;
-    padding-top: 15px;
-    border-top: 2px solid rgba(222, 184, 135, 0.3);
-    line-height: 1.6;
-}
-
-.mission-avatar {
-    width: 160px;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(139, 69, 19, 0.8);
-    border-left: 3px solid #DEB887;
-    padding: 20px;
-}
-
-.mission-image {
-    width: 120px;
-    height: 120px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 3px solid #FFD700;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-    transition: transform 0.4s ease;
-}
-
-.mission-card:hover .mission-image {
-    transform: scale(1.1);
-    border-color: #FFA500;
-}
-
-.back-btn {
-    position: fixed;
-    bottom: 25px;
-    right: 25px;
-    background: linear-gradient(135deg, #8B4513, #A0522D);
-    color: #FFD700;
-    border: 2px solid #DEB887;
-    padding: 12px 25px;
-    border-radius: 25px;
-    cursor: pointer;
-    font-family: 'Noto Serif TC', serif;
-    font-weight: 600;
-    font-size: 1.1em;
-    transition: all 0.3s ease;
-    z-index: 1000;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
-}
-
-.back-btn:hover {
-    background: linear-gradient(135deg, #A0522D, #8B4513);
-    transform: translateY(-2px) scale(1.05);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
-    border-color: #FFD700;
-}
-
-.loading-message {
-    text-align: center;
-    color: #FFD700;
-    font-size: 1.3em;
-    padding: 30px;
-    grid-column: 1 / -1;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
-    animation: pulse 1.5s infinite;
-}
-
-@keyframes pulse {
-    0% { opacity: 0.6; }
-    50% { opacity: 1; }
-    100% { opacity: 0.6; }
-}
-
-@media (max-width: 768px) {
+    h1 {
+        text-align: center;
+        color: #FFD700;
+        margin-bottom: 30px;
+        font-size: 2.5em;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        position: relative;
+        display: block;
+        width: 100%;
+        text-align: center;
+        margin: 0 auto;
+        padding: 0 20px;
+    }
+    
+    h1::after {
+        content: '';
+        position: absolute;
+        bottom: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100px;
+        height: 3px;
+        background: linear-gradient(to right, transparent, #FFD700, transparent);
+    }
+    
     .missions-grid {
-        grid-template-columns: 1fr;
-        gap: 20px;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 25px;
+        padding: 20px;
     }
     
     .mission-card {
-        height: auto;
+        background: rgba(139, 69, 19, 0.95);
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        cursor: pointer;
+        border: 3px solid #DEB887;
+        display: flex;
+        height: 220px;
+        position: relative;
+        backdrop-filter: blur(5px);
+    }
+    
+    .mission-card:hover {
+        transform: translateY(-8px) scale(1.02);
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.4);
+        border-color: #FFD700;
+    }
+    
+    .mission-status {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 0.9em;
+        font-weight: bold;
+        z-index: 1;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    
+    .status-available {
+        background: linear-gradient(135deg, #4CAF50, #45a049);
+        color: white;
+        border: 2px solid #45a049;
+    }
+    
+    .status-unavailable {
+        background: linear-gradient(135deg, #f44336, #da190b);
+        color: white;
+        border: 2px solid #da190b;
+    }
+    
+    .status-accepted {
+        background: linear-gradient(135deg, #FFA500, #FF8C00);
+        color: white;
+        border: 2px solid #FF8C00;
+    }
+    
+    .mission-info {
+        padding: 20px;
+        flex: 1;
+        display: flex;
         flex-direction: column;
+        justify-content: space-between;
+        background: linear-gradient(to right, rgba(139, 69, 19, 0.95), rgba(139, 69, 19, 0.8));
+    }
+    
+    .mission-title {
+        color: #FFD700;
+        font-size: 1.4em;
+        margin-bottom: 12px;
+        font-weight: bold;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        line-height: 1.3;
+    }
+    
+    .mission-description {
+        color: #FFE4B5;
+        font-size: 1.1em;
+        line-height: 1.5;
+        flex-grow: 1;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+    }
+    
+    .mission-details {
+        color: #DEB887;
+        font-size: 1em;
+        margin-top: 15px;
+        padding-top: 15px;
+        border-top: 2px solid rgba(222, 184, 135, 0.3);
+        line-height: 1.6;
     }
     
     .mission-avatar {
-        width: 100%;
-        height: 160px;
-        border-left: none;
-        border-bottom: 3px solid #DEB887;
-        padding: 15px;
+        width: 160px;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(139, 69, 19, 0.8);
+        border-left: 3px solid #DEB887;
+        padding: 20px;
     }
     
     .mission-image {
-        width: 100px;
-        height: 100px;
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid #FFD700;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        transition: transform 0.4s ease;
+    }
+    
+    .mission-card:hover .mission-image {
+        transform: scale(1.1);
+        border-color: #FFA500;
     }
     
     .back-btn {
-        bottom: 15px;
-        right: 15px;
-        padding: 8px 20px;
+        position: fixed;
+        bottom: 25px;
+        right: 25px;
+        background: linear-gradient(135deg, #8B4513, #A0522D);
+        color: #FFD700;
+        border: 2px solid #DEB887;
+        padding: 12px 25px;
+        border-radius: 25px;
+        cursor: pointer;
+        font-family: 'Noto Serif TC', serif;
+        font-weight: 600;
+        font-size: 1.1em;
+        transition: all 0.3s ease;
+        z-index: 1000;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
     }
-}
-    </style>
-</head>
-<body>
-    <button class="back-btn" onclick="goBack()">返回個人頁面</button>
-    <div class="container">
-        <h1>任務公佈欄</h1>
-        <div class="missions-grid" id="missionsGrid">
-            <div class="loading-message">載入任務中...</div>
+    
+    .back-btn:hover {
+        background: linear-gradient(135deg, #A0522D, #8B4513);
+        transform: translateY(-2px) scale(1.05);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        border-color: #FFD700;
+    }
+    
+    .loading-message {
+        text-align: center;
+        color: #FFD700;
+        font-size: 1.3em;
+        padding: 30px;
+        grid-column: 1 / -1;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        animation: pulse 1.5s infinite;
+    }
+    
+    @keyframes pulse {
+        0% { opacity: 0.6; }
+        50% { opacity: 1; }
+        100% { opacity: 0.6; }
+    }
+    
+    @media (max-width: 768px) {
+        .missions-grid {
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+        
+        .mission-card {
+            height: auto;
+            flex-direction: column;
+        }
+        
+        .mission-avatar {
+            width: 100%;
+            height: 160px;
+            border-left: none;
+            border-bottom: 3px solid #DEB887;
+            padding: 15px;
+        }
+        
+        .mission-image {
+            width: 100px;
+            height: 100px;
+        }
+        
+        .back-btn {
+            bottom: 15px;
+            right: 15px;
+            padding: 8px 20px;
+        }
+    }
+        </style>
+    </head>
+    <body>
+        <button class="back-btn" onclick="goBack()">返回個人頁面</button>
+        <div class="container">
+            <h1>任務公佈欄</h1>
+            <div class="missions-grid" id="missionsGrid">
+                <div class="loading-message">載入任務中...</div>
+            </div>
         </div>
-    </div>
-
-    <script>
-        // 返回個人頁面
-        function goBack() {
-            const userId = getUserIdFromUrl();
-            const userClass = getUserClassFromUrl();
-            console.log('當前用戶ID:', userId);
-            console.log('用戶職業:', userClass);
+    
+        <script>
+            // 返回個人頁面
+            function goBack() {
+                const userId = getUserIdFromUrl();
+                const userClass = getUserClassFromUrl();
+                console.log('當前用戶ID:', userId);
+                console.log('用戶職業:', userClass);
+                
+                if (userId) {
+                    let url;
+                    switch(userClass) {
+                        case 'assassin':
+                            url = 'assassin.html';
+                            break;
+                        case 'craftsman':
+                            url = 'craftsman.html';
+                            break;
+                        case 'traveler':
+                            url = 'traveler.html';
+                            break;
+                        case 'warrior':
+                            url = 'warrior.html';
+                            break;
+                        case 'mage':
+                            url = 'mage.html';
+                            break;
+                        default:
+                            url = 'index.html';
+                    }
+                    
+                    url += `?id=${encodeURIComponent(userId)}`;
+                    console.log('跳轉到:', url);
+                    window.location.href = url;
+                } else {
+                    console.log('未找到用戶ID，返回首頁');
+                    window.location.href = 'index.html';
+                }
+            }
+    
+            // 從 URL 獲取用戶 ID
+            function getUserIdFromUrl() {
+                const urlParams = new URLSearchParams(window.location.search);
+                return urlParams.get('id');
+            }
+    
+            // 從 URL 獲取用戶職業
+            function getUserClassFromUrl() {
+                const urlParams = new URLSearchParams(window.location.search);
+                return urlParams.get('class');
+            }
+    
+         // 創建任務卡片
+    function createMissionCard(missionId, mission) {
+        const card = document.createElement('div');
+        card.className = 'mission-card';
+        const userId = getUserIdFromUrl();
+        const userClass = getUserClassFromUrl();
+        
+        card.onclick = () => {
+            // 跳轉到任務詳情頁面
+            window.location.href = `mission-detail.html?id=${missionId}&userId=${userId}&class=${userClass}`;
+        };
+        
+        // 添加任務狀態樣式
+        let statusHtml = '';
+        if (mission.status) {
+            let statusClass;
+            let statusText = mission.status;
             
-            if (userId) {
-                let url;
-                switch(userClass) {
-                    case 'assassin':
-                        url = 'assassin.html';
+            // 檢查是否達到人數上限
+            const currentAcceptedCount = mission.acceptedBy ? Object.keys(mission.acceptedBy).length : 0;
+            const maxAcceptedCount = mission.maxAcceptedCount || 1; // 默認最多1人
+            
+            if (currentAcceptedCount >= maxAcceptedCount) {
+                statusClass = 'status-unavailable';
+                statusText = '已額滿';
+            } else {
+                switch(mission.status) {
+                    case '可接取':
+                        statusClass = 'status-available';
                         break;
-                    case 'craftsman':
-                        url = 'craftsman.html';
-                        break;
-                    case 'traveler':
-                        url = 'traveler.html';
-                        break;
-                    case 'warrior':
-                        url = 'warrior.html';
-                        break;
-                    case 'mage':
-                        url = 'mage.html';
+                    case '已接取':
+                        statusClass = 'status-accepted';
                         break;
                     default:
-                        url = 'index.html';
+                        statusClass = 'status-unavailable';
                 }
-                
-                url += `?id=${encodeURIComponent(userId)}`;
-                console.log('跳轉到:', url);
-                window.location.href = url;
-            } else {
-                console.log('未找到用戶ID，返回首頁');
-                window.location.href = 'index.html';
+            }
+            
+            statusHtml = `<div class="mission-status ${statusClass}">${statusText}</div>`;
+        }
+        
+        // 根據職業選擇對應的頭像
+        let avatarImage = 'images/default-avatar.jpg';
+        if (mission.userClass) {
+            switch(mission.userClass) {
+                case 'warrior':
+                    avatarImage = 'images/warrior-avatar.jpg';
+                    break;
+                case 'mage':
+                    avatarImage = 'images/mage-avatar.jpg';
+                    break;
+                case 'assassin':
+                    avatarImage = 'images/assassin-avatar.jpg';
+                    break;
+                case 'craftsman':
+                    avatarImage = 'images/craftsman-avatar.jpg';
+                    break;
+                case 'traveler':
+                    avatarImage = 'images/traveler-avatar.jpg';
+                    break;
             }
         }
-
-        // 從 URL 獲取用戶 ID
-        function getUserIdFromUrl() {
-            const urlParams = new URLSearchParams(window.location.search);
-            return urlParams.get('id');
-        }
-
-        // 從 URL 獲取用戶職業
-        function getUserClassFromUrl() {
-            const urlParams = new URLSearchParams(window.location.search);
-            return urlParams.get('class');
-        }
-
-     // 創建任務卡片
-function createMissionCard(missionId, mission) {
-    const card = document.createElement('div');
-    card.className = 'mission-card';
-    const userId = getUserIdFromUrl();
-    const userClass = getUserClassFromUrl();
-    
-    card.onclick = () => {
-        // 跳轉到任務詳情頁面
-        window.location.href = `mission-detail.html?id=${missionId}&userId=${userId}&class=${userClass}`;
-    };
-    
-    // 添加任務狀態樣式
-    let statusHtml = '';
-    if (mission.status) {
-        let statusClass;
-        let statusText = mission.status;
         
-        // 檢查是否達到人數上限
+        // 計算當前接取人數和上限
         const currentAcceptedCount = mission.acceptedBy ? Object.keys(mission.acceptedBy).length : 0;
-        const maxAcceptedCount = mission.maxAcceptedCount || 1; // 默認最多1人
+        const maxAcceptedCount = mission.maxAcceptedCount || 1;
         
-        if (currentAcceptedCount >= maxAcceptedCount) {
-            statusClass = 'status-unavailable';
-            statusText = '已額滿';
-        } else {
-            switch(mission.status) {
-                case '可接取':
-                    statusClass = 'status-available';
-                    break;
-                case '已接取':
-                    statusClass = 'status-accepted';
-                    break;
-                default:
-                    statusClass = 'status-unavailable';
+        card.innerHTML = `
+            ${statusHtml}
+            <div class="mission-info">
+                <div>
+                    <div class="mission-title">${mission.title || '未命名任務'}</div>
+                    <div class="mission-description">${mission.description || '無描述'}</div>
+                </div>
+                <div class="mission-details">
+                    報酬: ${mission.reward || '0'}金幣<br>
+                    發布者: ${mission.publisher || '未知'}<br>
+                    時限: ${mission.deadline || '無限制'}<br>
+                    接取人數: ${currentAcceptedCount}/${maxAcceptedCount}
+                </div>
+            </div>
+            <div class="mission-avatar">
+                <img src="${avatarImage}" alt="發布者頭像" class="mission-image" onerror="this.src='images/default-avatar.jpg'">
+            </div>
+        `;
+        
+        return card;
+    }
+    
+            // 載入任務列表
+    async function loadMissions() {
+        const missionsGrid = document.querySelector('.missions-grid');
+        missionsGrid.innerHTML = '<div class="loading-message">載入任務中...</div>';
+        
+        try {
+            const missions = await window.getMissions();
+            
+            if (!missions || missions.length === 0) {
+                missionsGrid.innerHTML = '<div class="loading-message">目前沒有任務</div>';
+                return;
             }
-        }
-        
-        statusHtml = `<div class="mission-status ${statusClass}">${statusText}</div>`;
-    }
-    
-    // 根據職業選擇對應的頭像
-    let avatarImage = 'images/default-avatar.jpg';
-    if (mission.userClass) {
-        switch(mission.userClass) {
-            case 'warrior':
-                avatarImage = 'images/warrior-avatar.jpg';
-                break;
-            case 'mage':
-                avatarImage = 'images/mage-avatar.jpg';
-                break;
-            case 'assassin':
-                avatarImage = 'images/assassin-avatar.jpg';
-                break;
-            case 'craftsman':
-                avatarImage = 'images/craftsman-avatar.jpg';
-                break;
-            case 'traveler':
-                avatarImage = 'images/traveler-avatar.jpg';
-                break;
+            
+            missionsGrid.innerHTML = '';
+            // 顯示所有任務，不再過濾可接取狀態
+            missions.forEach(mission => {
+                const missionCard = createMissionCard(mission.id, mission);
+                missionsGrid.appendChild(missionCard);
+            });
+        } catch (error) {
+            console.error('Error loading missions:', error);
+            missionsGrid.innerHTML = '<div class="loading-message">載入任務時發生錯誤，請稍後再試</div>';
         }
     }
     
-    // 計算當前接取人數和上限
-    const currentAcceptedCount = mission.acceptedBy ? Object.keys(mission.acceptedBy).length : 0;
-    const maxAcceptedCount = mission.maxAcceptedCount || 1;
-    
-    card.innerHTML = `
-        ${statusHtml}
-        <div class="mission-info">
-            <div>
-                <div class="mission-title">${mission.title || '未命名任務'}</div>
-                <div class="mission-description">${mission.description || '無描述'}</div>
-            </div>
-            <div class="mission-details">
-                報酬: ${mission.reward || '0'}金幣<br>
-                發布者: ${mission.publisher || '未知'}<br>
-                時限: ${mission.deadline || '無限制'}<br>
-                接取人數: ${currentAcceptedCount}/${maxAcceptedCount}
-            </div>
-        </div>
-        <div class="mission-avatar">
-            <img src="${avatarImage}" alt="發布者頭像" class="mission-image" onerror="this.src='images/default-avatar.jpg'">
-        </div>
-    `;
-    
-    return card;
-}
-}
-
-        // 載入任務列表
-async function loadMissions() {
-    const missionsGrid = document.querySelector('.missions-grid');
-    missionsGrid.innerHTML = '<div class="loading-message">載入任務中...</div>';
-    
-    try {
-        const missions = await window.getMissions();
-        
-        if (!missions || missions.length === 0) {
-            missionsGrid.innerHTML = '<div class="loading-message">目前沒有任務</div>';
-            return;
-        }
-        
-        missionsGrid.innerHTML = '';
-        // 顯示所有任務，不再過濾可接取狀態
-        missions.forEach(mission => {
-            const missionCard = createMissionCard(mission.id, mission);
-            missionsGrid.appendChild(missionCard);
-        });
-    } catch (error) {
-        console.error('Error loading missions:', error);
-        missionsGrid.innerHTML = '<div class="loading-message">載入任務時發生錯誤，請稍後再試</div>';
-    }
-}
-
-        // 頁面載入時執行
-        document.addEventListener('DOMContentLoaded', function() {
-            loadMissions();
-        });
-    </script>
-</body>
-</html>
+            // 頁面載入時執行
+            document.addEventListener('DOMContentLoaded', function() {
+                loadMissions();
+            });
+        </script>
+    </body>
+    </html>
