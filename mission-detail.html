@@ -263,107 +263,143 @@
         }
 
        // 載入任務詳情
-        async function loadMissionDetail() {
-            const { missionId, userId } = getUrlParams();
-            const missionDetail = document.getElementById('missionDetail');
-            
-            try {
-                const missionDoc = await window.db.collection('missions').doc(missionId).get();
-                const mission = missionDoc.data();
-                
-                if (!mission) {
-                    missionDetail.innerHTML = '<div class="loading-message">找不到此任務</div>';
-                    return;
-                }
+async function loadMissionDetail() {
+    const { missionId, userId } = getUrlParams();
+    const missionDetail = document.getElementById('missionDetail');
+    
+    try {
+        const missionDoc = await window.db.collection('missions').doc(missionId).get();
+        const mission = missionDoc.data();
+        
+        if (!mission) {
+            missionDetail.innerHTML = '<div class="loading-message">找不到此任務</div>';
+            return;
+        }
 
-                // 獲取發布者信息
-                const publisherDoc = await window.db.collection('users').doc(mission.userId).get();
-                const publisherData = publisherDoc.data();
-                
-                // 根據職業選擇頭像
-                let avatarImage = 'images/default-avatar.jpg';
-                if (mission.userClass) {
-                    switch(mission.userClass) {
-                        case 'warrior': avatarImage = 'images/warrior-avatar.jpg'; break;
-                        case 'mage': avatarImage = 'images/mage-avatar.jpg'; break;
-                        case 'assassin': avatarImage = 'images/assassin-avatar.jpg'; break;
-                        case 'craftsman': avatarImage = 'images/craftsman-avatar.jpg'; break;
-                        case 'traveler': avatarImage = 'images/traveler-avatar.jpg'; break;
-                    }
-                }
-
-                // 計算當前接取人數和上限
-                const currentAcceptedCount = mission.acceptedBy ? Object.keys(mission.acceptedBy).length : 0;
-                const maxAcceptedCount = mission.maxAcceptedCount || 1;
-                const isFull = currentAcceptedCount >= maxAcceptedCount;
-                const hasAccepted = mission.acceptedBy && mission.acceptedBy[userId];
-
-                // 生成接取按鈕的 HTML
-                let acceptButtonHtml = '';
-                if (mission.userId !== userId) { // 不是任務發布者
-                    if (isFull) {
-                        acceptButtonHtml = '<button class="accept-btn" disabled>已額滿</button>';
-                    } else if (hasAccepted) {
-                        acceptButtonHtml = '<button class="accept-btn" disabled>已接取</button>';
-                    } else {
-                        acceptButtonHtml = '<button class="accept-btn" onclick="acceptMission()">接取任務</button>';
-                    }
-                }
-
-                missionDetail.innerHTML = `
-                    <div class="mission-header">
-                        <img src="${avatarImage}" alt="發布者頭像" class="mission-avatar">
-                        <div class="mission-info">
-                            <h1 class="mission-title">${mission.title}</h1>
-                            <div class="mission-description">${mission.description}</div>
-                            <div class="mission-meta">
-                                發布者: ${publisherData.nickname || '未知'}<br>
-                                報酬: ${mission.reward}金幣<br>
-                                截止日期: ${mission.deadline}<br>
-                                接取人數: ${currentAcceptedCount}/${maxAcceptedCount}<br>
-                                狀態: ${mission.status}
-                            </div>
-                            ${acceptButtonHtml}
-                        </div>
-                    </div>
-                `;
-            } catch (error) {
-                console.error('Error loading mission:', error);
-                missionDetail.innerHTML = '<div class="loading-message">載入任務時發生錯誤</div>';
+        // 獲取發布者信息
+        const publisherDoc = await window.db.collection('users').doc(mission.userId).get();
+        const publisherData = publisherDoc.data();
+        
+        // 根據職業選擇頭像
+        let avatarImage = 'images/default-avatar.jpg';
+        if (mission.userClass) {
+            switch(mission.userClass) {
+                case 'warrior': avatarImage = 'images/warrior-avatar.jpg'; break;
+                case 'mage': avatarImage = 'images/mage-avatar.jpg'; break;
+                case 'assassin': avatarImage = 'images/assassin-avatar.jpg'; break;
+                case 'craftsman': avatarImage = 'images/craftsman-avatar.jpg'; break;
+                case 'traveler': avatarImage = 'images/traveler-avatar.jpg'; break;
             }
         }
+
+        // 計算當前接取人數和上限
+        const currentAcceptedCount = mission.acceptedBy ? Object.keys(mission.acceptedBy).length : 0;
+        const maxAcceptedCount = mission.maxAcceptedCount || 1;
+        const isFull = currentAcceptedCount >= maxAcceptedCount;
+        const hasAccepted = mission.acceptedBy && mission.acceptedBy[userId];
+
+        // 確定任務狀態
+        let status = mission.status;
+        if (isFull) {
+            status = '已額滿';
+        } else if (hasAccepted) {
+            status = '已接取';
+        } else {
+            status = '可接取';
+        }
+
+        // 生成接取按鈕的 HTML
+        let acceptButtonHtml = '';
+        if (mission.userId !== userId) { // 不是任務發布者
+            if (isFull) {
+                acceptButtonHtml = '<button class="accept-btn" disabled>已額滿</button>';
+            } else if (hasAccepted) {
+                acceptButtonHtml = '<button class="accept-btn" disabled>已接取</button>';
+            } else {
+                acceptButtonHtml = '<button class="accept-btn" onclick="acceptMission()">接取任務</button>';
+            }
+        }
+
+        missionDetail.innerHTML = `
+            <div class="mission-header">
+                <img src="${avatarImage}" alt="發布者頭像" class="mission-avatar">
+                <div class="mission-info">
+                    <h1 class="mission-title">${mission.title}</h1>
+                    <div class="mission-description">${mission.description}</div>
+                    <div class="mission-meta">
+                        發布者: ${publisherData.nickname || '未知'}<br>
+                        報酬: ${mission.reward}金幣<br>
+                        截止日期: ${mission.deadline}<br>
+                        接取人數: ${currentAcceptedCount}/${maxAcceptedCount}<br>
+                        狀態: <span class="mission-status ${getStatusClass(status)}">${status}</span>
+                    </div>
+                    ${acceptButtonHtml}
+                </div>
+            </div>
+        `;
+    } catch (error) {
+        console.error('Error loading mission:', error);
+        missionDetail.innerHTML = '<div class="loading-message">載入任務時發生錯誤</div>';
+    }
+}
+
+// 添加 getStatusClass 函數
+function getStatusClass(status) {
+    switch(status) {
+        case '可接取':
+            return 'status-available';
+        case '已額滿':
+            return 'status-unavailable';
+        case '已接取':
+            return 'status-accepted';
+        default:
+            return '';
+    }
+}
 
         // 添加接取任務的函數
-        async function acceptMission() {
-            const { missionId, userId } = getUrlParams();
-            
-            try {
-                const missionRef = window.db.collection('missions').doc(missionId);
-                const missionDoc = await missionRef.get();
-                const mission = missionDoc.data();
-                
-                // 檢查是否已達到人數上限
-                const currentAcceptedCount = mission.acceptedBy ? Object.keys(mission.acceptedBy).length : 0;
-                const maxAcceptedCount = mission.maxAcceptedCount || 1;
-                
-                if (currentAcceptedCount >= maxAcceptedCount) {
-                    alert('此任務已達到接取人數上限！');
-                    return;
-                }
-                
-                // 更新任務狀態
-                await missionRef.update({
-                    [`acceptedBy.${userId}`]: true,
-                    status: currentAcceptedCount + 1 >= maxAcceptedCount ? '已額滿' : '可接取'
-                });
-                
-                alert('接取任務成功！');
-                loadMissionDetail(); // 重新載入任務詳情
-            } catch (error) {
-                console.error('Error accepting mission:', error);
-                alert('接取任務時發生錯誤');
-            }
+async function acceptMission() {
+    const { missionId, userId } = getUrlParams();
+    
+    try {
+        const missionRef = window.db.collection('missions').doc(missionId);
+        const missionDoc = await missionRef.get();
+        const mission = missionDoc.data();
+        
+        // 檢查是否已達到人數上限
+        const currentAcceptedCount = mission.acceptedBy ? Object.keys(mission.acceptedBy).length : 0;
+        const maxAcceptedCount = mission.maxAcceptedCount || 1;
+        
+        if (currentAcceptedCount >= maxAcceptedCount) {
+            alert('此任務已達到接取人數上限！');
+            return;
         }
+        
+        // 檢查是否已經接取過
+        if (mission.acceptedBy && mission.acceptedBy[userId]) {
+            alert('你已經接取過此任務了！');
+            return;
+        }
+        
+        // 更新任務狀態
+        const updates = {
+            [`acceptedBy.${userId}`]: true,
+            status: currentAcceptedCount + 1 >= maxAcceptedCount ? '已額滿' : '可接取'
+        };
+        
+        // 添加接取時間
+        updates[`acceptedAt.${userId}`] = firebase.firestore.FieldValue.serverTimestamp();
+        
+        await missionRef.update(updates);
+        
+        alert('接取任務成功！');
+        loadMissionDetail(); // 重新載入任務詳情
+    } catch (error) {
+        console.error('Error accepting mission:', error);
+        alert('接取任務時發生錯誤');
+    }
+}
+
 
         // 載入留言
         async function loadComments() {
