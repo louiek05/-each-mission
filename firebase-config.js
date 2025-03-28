@@ -49,10 +49,41 @@ window.getUserMissions = async function(userId) {
         console.log('獲取到的用戶任務數量:', snapshot.size);
         
         if (!snapshot.empty) {
-            return snapshot.docs.map(doc => ({
-                id: doc.id,
-                ...doc.data()
-            }));
+            const missions = [];
+            for (const doc of snapshot.docs) {
+                const missionData = doc.data();
+                const missionId = doc.id;
+                
+                // 如果有接取者，獲取他們的用戶資料
+                if (missionData.acceptedBy && Object.keys(missionData.acceptedBy).length > 0) {
+                    const acceptedByData = {};
+                    for (const [acceptedUserId, acceptedData] of Object.entries(missionData.acceptedBy)) {
+                        try {
+                            const userDoc = await window.db.collection('users').doc(acceptedUserId).get();
+                            if (userDoc.exists) {
+                                const userData = userDoc.data();
+                                acceptedByData[acceptedUserId] = {
+                                    ...acceptedData,
+                                    nickname: userData.nickname || '未知用戶'
+                                };
+                            }
+                        } catch (error) {
+                            console.error('獲取用戶資料失敗:', error);
+                            acceptedByData[acceptedUserId] = {
+                                ...acceptedData,
+                                nickname: '未知用戶'
+                            };
+                        }
+                    }
+                    missionData.acceptedBy = acceptedByData;
+                }
+                
+                missions.push({
+                    id: missionId,
+                    ...missionData
+                });
+            }
+            return missions;
         } else {
             console.log('沒有找到用戶任務');
             return [];
