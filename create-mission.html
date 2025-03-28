@@ -242,6 +242,10 @@
                 <label for="deadline">截止日期</label>
                 <input type="date" id="deadline" required>
             </div>
+            <div class="form-group">
+                <label for="maxAcceptedCount">接取人數上限</label>
+                <input type="number" id="maxAcceptedCount" placeholder="設定可以接取任務的人數上限" required min="1" value="1">
+            </div>
             <button type="submit" class="submit-btn">發佈任務</button>
         </form>
     <div class="my-missions">
@@ -268,14 +272,14 @@
             window.location.href = `${userClass}.html?id=${userId}`;
         }
 
-       // 在發任務網頁的 script 部分修改
-document.getElementById('taskForm').addEventListener('submit', async function(e) {
+    document.getElementById('taskForm').addEventListener('submit', async function(e) {
     e.preventDefault();
     const userId = getUserIdFromUrl();
     const title = document.getElementById('title').value;
     const description = document.getElementById('description').value;
     const reward = document.getElementById('reward').value;
     const deadline = document.getElementById('deadline').value;
+    const maxAcceptedCount = document.getElementById('maxAcceptedCount').value;
 
     try {
         // 獲取用戶資料以取得發布者名稱
@@ -290,7 +294,10 @@ document.getElementById('taskForm').addEventListener('submit', async function(e)
             description: description,
             reward: parseInt(reward),
             publisher: publisher,
-            deadline: deadline
+            deadline: deadline,
+            maxAcceptedCount: parseInt(maxAcceptedCount),
+            acceptedBy: {}, // 用於追蹤接取任務的用戶
+            status: '可接取' // 初始狀態
         };
 
         // 使用新的 createMission 函數創建任務
@@ -322,38 +329,43 @@ document.getElementById('taskForm').addEventListener('submit', async function(e)
                     return;
                 }
                 
-                missionsList.innerHTML = missions.map(mission => `
-                    <div class="mission-item" data-id="${mission.id}">
-                        <h3>${mission.title}</h3>
-                        <p>${mission.description}</p>
-                        <p>報酬: ${mission.reward}金幣</p>
-                        <p>截止日期: ${mission.deadline}</p>
-                        <p>狀態: ${mission.status}</p>
-                        <div class="mission-actions">
-                            <button class="edit-btn" onclick="showEditForm('${mission.id}')">修改</button>
-                            <button class="delete-btn" onclick="deleteMission('${mission.id}')">刪除</button>
-                        </div>
-                        <div class="edit-form" id="editForm-${mission.id}">
-                            <div class="form-group">
-                                <label>標題</label>
-                                <input type="text" value="${mission.title}" id="edit-title-${mission.id}">
-                            </div>
-                            <div class="form-group">
-                                <label>描述</label>
-                                <textarea id="edit-description-${mission.id}">${mission.description}</textarea>
-                            </div>
-                            <div class="form-group">
-                                <label>報酬</label>
-                                <input type="number" value="${mission.reward}" id="edit-reward-${mission.id}">
-                            </div>
-                            <div class="form-group">
-                                <label>截止日期</label>
-                                <input type="date" value="${mission.deadline}" id="edit-deadline-${mission.id}">
-                            </div>
-                            <button class="submit-btn" onclick="updateMission('${mission.id}')">保存修改</button>
-                        </div>
-                    </div>
-                `).join('');
+               missionsList.innerHTML = missions.map(mission => `
+    <div class="mission-item" data-id="${mission.id}">
+        <h3>${mission.title}</h3>
+        <p>${mission.description}</p>
+        <p>報酬: ${mission.reward}金幣</p>
+        <p>截止日期: ${mission.deadline}</p>
+        <p>接取人數上限: ${mission.maxAcceptedCount || 1}</p>
+        <p>狀態: ${mission.status}</p>
+        <div class="mission-actions">
+            <button class="edit-btn" onclick="showEditForm('${mission.id}')">修改</button>
+            <button class="delete-btn" onclick="deleteMission('${mission.id}')">刪除</button>
+        </div>
+        <div class="edit-form" id="editForm-${mission.id}">
+            <div class="form-group">
+                <label>標題</label>
+                <input type="text" value="${mission.title}" id="edit-title-${mission.id}">
+            </div>
+            <div class="form-group">
+                <label>描述</label>
+                <textarea id="edit-description-${mission.id}">${mission.description}</textarea>
+            </div>
+            <div class="form-group">
+                <label>報酬</label>
+                <input type="number" value="${mission.reward}" id="edit-reward-${mission.id}">
+            </div>
+            <div class="form-group">
+                <label>截止日期</label>
+                <input type="date" value="${mission.deadline}" id="edit-deadline-${mission.id}">
+            </div>
+            <div class="form-group">
+                <label>接取人數上限</label>
+                <input type="number" value="${mission.maxAcceptedCount || 1}" id="edit-maxAcceptedCount-${mission.id}" min="1">
+            </div>
+            <button class="submit-btn" onclick="updateMission('${mission.id}')">保存修改</button>
+        </div>
+    </div>
+`).join('');
             } catch (error) {
                 console.error('Error loading missions:', error);
                 missionsList.innerHTML = '<div class="loading-message">載入任務時發生錯誤</div>';
@@ -367,28 +379,30 @@ document.getElementById('taskForm').addEventListener('submit', async function(e)
         }
 
         // 更新任務
-        async function updateMission(missionId) {
-            try {
-                const title = document.getElementById(`edit-title-${missionId}`).value;
-                const description = document.getElementById(`edit-description-${missionId}`).value;
-                const reward = document.getElementById(`edit-reward-${missionId}`).value;
-                const deadline = document.getElementById(`edit-deadline-${missionId}`).value;
+       async function updateMission(missionId) {
+    try {
+        const title = document.getElementById(`edit-title-${missionId}`).value;
+        const description = document.getElementById(`edit-description-${missionId}`).value;
+        const reward = document.getElementById(`edit-reward-${missionId}`).value;
+        const deadline = document.getElementById(`edit-deadline-${missionId}`).value;
+        const maxAcceptedCount = document.getElementById(`edit-maxAcceptedCount-${missionId}`).value;
 
-                await window.db.collection('missions').doc(missionId).update({
-                    title: title,
-                    description: description,
-                    reward: parseInt(reward),
-                    deadline: deadline
-                });
+        await window.db.collection('missions').doc(missionId).update({
+            title: title,
+            description: description,
+            reward: parseInt(reward),
+            deadline: deadline,
+            maxAcceptedCount: parseInt(maxAcceptedCount)
+        });
 
-                alert('任務更新成功！');
-                showEditForm(missionId);
-                loadMyMissions();
-            } catch (error) {
-                console.error('Error updating mission:', error);
-                alert('更新任務時發生錯誤');
-            }
-        }
+        alert('任務更新成功！');
+        showEditForm(missionId);
+        loadMyMissions();
+    } catch (error) {
+        console.error('Error updating mission:', error);
+        alert('更新任務時發生錯誤');
+    }
+}
 
         // 刪除任務
         async function deleteMission(missionId) {
