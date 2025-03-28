@@ -158,17 +158,26 @@ window.getMissions = async function() {
         console.log('獲取到的任務數量:', snapshot.size);
         
         if (!snapshot.empty) {
-            return snapshot.docs.map(doc => ({
-                id: doc.id,
-                title: doc.data().title || '未命名任務',
-                description: doc.data().description || '無描述',
-                reward: doc.data().reward || 0,
-                publisher: doc.data().publisher || '未知',
-                deadline: doc.data().deadline || '無限制',
-                image: doc.data().image || 'path/to/default-mission-image.jpg',
-                status: doc.data().status || '可接取',
-                ...doc.data()
-            }));
+            return snapshot.docs.map(doc => {
+                const data = doc.data();
+                const currentAcceptedCount = data.acceptedBy ? Object.keys(data.acceptedBy).length : 0;
+                const maxAcceptedCount = data.maxAcceptedCount || 1;
+                
+                return {
+                    id: doc.id,
+                    title: data.title || '未命名任務',
+                    description: data.description || '無描述',
+                    reward: data.reward || 0,
+                    publisher: data.publisher || '未知',
+                    deadline: data.deadline || '無限制',
+                    image: data.image || 'path/to/default-mission-image.jpg',
+                    status: data.status || '可接取',
+                    acceptedBy: data.acceptedBy || {},
+                    maxAcceptedCount: maxAcceptedCount,
+                    currentAcceptedCount: currentAcceptedCount,  // 添加當前接取人數
+                    ...data
+                };
+            });
         } else {
             console.log('沒有找到任務');
             return [];
