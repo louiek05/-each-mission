@@ -384,23 +384,23 @@
         const maxAcceptedCount = mission.maxAcceptedCount || 1;
         
         card.innerHTML = `
-            ${statusHtml}
-            <div class="mission-info">
-                <div>
-                    <div class="mission-title">${mission.title || '未命名任務'}</div>
-                    <div class="mission-description">${mission.description || '無描述'}</div>
-                </div>
-                <div class="mission-details">
-                    報酬: ${mission.reward || '0'}金幣<br>
-                    發布者: ${mission.publisher || '未知'}<br>
-                    時限: ${mission.deadline || '無限制'}<br>
-                    接取人數: ${currentAcceptedCount}/${maxAcceptedCount}
-                </div>
-            </div>
-            <div class="mission-avatar">
-                <img src="${avatarImage}" alt="發布者頭像" class="mission-image" onerror="this.src='images/default-avatar.jpg'">
-            </div>
-        `;
+    ${statusHtml}
+    <div class="mission-info">
+        <div>
+            <div class="mission-title">${mission.title || '未命名任務'}</div>
+            <div class="mission-description">${mission.description || '無描述'}</div>
+        </div>
+        <div class="mission-details">
+            報酬: ${mission.reward || '0'}金幣<br>
+            發布者: ${mission.publisher || '未知'}<br>
+            時限: ${mission.deadline || '無限制'}<br>
+            接取人數: ${mission.currentAcceptedCount}/${mission.maxAcceptedCount}
+        </div>
+    </div>
+    <div class="mission-avatar">
+        <img src="${avatarImage}" alt="發布者頭像" class="mission-image" onerror="this.src='images/default-avatar.jpg'">
+    </div>
+`;
         
         return card;
     }
