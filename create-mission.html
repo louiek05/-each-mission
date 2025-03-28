@@ -240,6 +240,35 @@
     background: linear-gradient(135deg, #FFA500, #FF8C00);
     color: white;
 }
+
+        .accepted-users {
+    margin-top: 15px;
+    padding: 10px;
+    background: rgba(222, 184, 135, 0.1);
+    border-radius: 8px;
+    border: 1px solid #DEB887;
+}
+
+.accepted-users h4 {
+    color: #FFD700;
+    margin-bottom: 8px;
+    font-size: 1.1em;
+}
+
+.user-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.user-tag {
+    background: rgba(139, 69, 19, 0.8);
+    color: #FFE4B5;
+    padding: 4px 12px;
+    border-radius: 15px;
+    font-size: 0.9em;
+    border: 1px solid #DEB887;
+}
     </style>
 </head>
 <body>
@@ -334,6 +363,19 @@
         <p>截止日期: ${mission.deadline}</p>
         <p>接取人數: ${mission.acceptedBy ? Object.keys(mission.acceptedBy).length : 0}/${mission.maxAcceptedCount || 1}</p>
         <p class="mission-status ${getStatusClass(mission.status)}">${mission.status}</p>
+        
+        <!-- 添加接取者列表 -->
+        ${mission.acceptedBy && Object.keys(mission.acceptedBy).length > 0 ? `
+            <div class="accepted-users">
+                <h4>接取者列表：</h4>
+                <div class="user-list">
+                    ${Object.entries(mission.acceptedBy).map(([userId, userData]) => `
+                        <span class="user-tag">${userData.nickname || '未知用戶'}</span>
+                    `).join('')}
+                </div>
+            </div>
+        ` : ''}
+        
         <div class="mission-actions">
             <button class="edit-btn" onclick="showEditForm('${mission.id}')">修改</button>
             <button class="delete-btn" onclick="deleteMission('${mission.id}')">刪除</button>
