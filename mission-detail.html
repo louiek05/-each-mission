@@ -174,6 +174,55 @@
             background: linear-gradient(135deg, #A0522D, #8B4513);
             transform: translateY(-2px);
         }
+
+         .accept-btn {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            border: 2px solid #45a049;
+            padding: 12px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+            font-family: 'Noto Serif TC', serif;
+        }
+
+        .accept-btn:hover {
+            background: linear-gradient(135deg, #45a049, #4CAF50);
+            transform: translateY(-2px);
+        }
+
+        .accept-btn:disabled {
+            background: #cccccc;
+            border-color: #999999;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .mission-status {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 15px;
+            font-size: 0.9em;
+            margin-top: 10px;
+        }
+
+        .status-available {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+        }
+
+        .status-unavailable {
+            background: linear-gradient(135deg, #f44336, #da190b);
+            color: white;
+        }
+
+        .status-accepted {
+            background: linear-gradient(135deg, #FFA500, #FF8C00);
+            color: white;
+        }
     </style>
 </head>
 <body>
@@ -213,9 +262,9 @@
             window.location.href = `missions.html?id=${userId}&class=${userClass}`;
         }
 
-        // 載入任務詳情
+       // 載入任務詳情
         async function loadMissionDetail() {
-            const { missionId } = getUrlParams();
+            const { missionId, userId } = getUrlParams();
             const missionDetail = document.getElementById('missionDetail');
             
             try {
@@ -243,6 +292,24 @@
                     }
                 }
 
+                // 計算當前接取人數和上限
+                const currentAcceptedCount = mission.acceptedBy ? Object.keys(mission.acceptedBy).length : 0;
+                const maxAcceptedCount = mission.maxAcceptedCount || 1;
+                const isFull = currentAcceptedCount >= maxAcceptedCount;
+                const hasAccepted = mission.acceptedBy && mission.acceptedBy[userId];
+
+                // 生成接取按鈕的 HTML
+                let acceptButtonHtml = '';
+                if (mission.userId !== userId) { // 不是任務發布者
+                    if (isFull) {
+                        acceptButtonHtml = '<button class="accept-btn" disabled>已額滿</button>';
+                    } else if (hasAccepted) {
+                        acceptButtonHtml = '<button class="accept-btn" disabled>已接取</button>';
+                    } else {
+                        acceptButtonHtml = '<button class="accept-btn" onclick="acceptMission()">接取任務</button>';
+                    }
+                }
+
                 missionDetail.innerHTML = `
                     <div class="mission-header">
                         <img src="${avatarImage}" alt="發布者頭像" class="mission-avatar">
@@ -253,14 +320,48 @@
                                 發布者: ${publisherData.nickname || '未知'}<br>
                                 報酬: ${mission.reward}金幣<br>
                                 截止日期: ${mission.deadline}<br>
+                                接取人數: ${currentAcceptedCount}/${maxAcceptedCount}<br>
                                 狀態: ${mission.status}
                             </div>
+                            ${acceptButtonHtml}
                         </div>
                     </div>
                 `;
             } catch (error) {
                 console.error('Error loading mission:', error);
                 missionDetail.innerHTML = '<div class="loading-message">載入任務時發生錯誤</div>';
+            }
+        }
+
+        // 添加接取任務的函數
+        async function acceptMission() {
+            const { missionId, userId } = getUrlParams();
+            
+            try {
+                const missionRef = window.db.collection('missions').doc(missionId);
+                const missionDoc = await missionRef.get();
+                const mission = missionDoc.data();
+                
+                // 檢查是否已達到人數上限
+                const currentAcceptedCount = mission.acceptedBy ? Object.keys(mission.acceptedBy).length : 0;
+                const maxAcceptedCount = mission.maxAcceptedCount || 1;
+                
+                if (currentAcceptedCount >= maxAcceptedCount) {
+                    alert('此任務已達到接取人數上限！');
+                    return;
+                }
+                
+                // 更新任務狀態
+                await missionRef.update({
+                    [`acceptedBy.${userId}`]: true,
+                    status: currentAcceptedCount + 1 >= maxAcceptedCount ? '已額滿' : '可接取'
+                });
+                
+                alert('接取任務成功！');
+                loadMissionDetail(); // 重新載入任務詳情
+            } catch (error) {
+                console.error('Error accepting mission:', error);
+                alert('接取任務時發生錯誤');
             }
         }
 
