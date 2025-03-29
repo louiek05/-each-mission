@@ -378,12 +378,11 @@
                     break;
             }
         }
-        
         // 計算當前接取人數和上限
-        const currentAcceptedCount = mission.acceptedBy ? Object.keys(mission.acceptedBy).length : 0;
-        const maxAcceptedCount = mission.maxAcceptedCount || 1;
-        
-        card.innerHTML = `
+    const currentAcceptedCount = mission.acceptedBy ? Object.keys(mission.acceptedBy).length : 0;
+    const maxAcceptedCount = mission.maxAcceptedCount || 1;
+    
+    card.innerHTML = `
     ${statusHtml}
     <div class="mission-info">
         <div>
@@ -394,16 +393,16 @@
             報酬: ${mission.reward || '0'}金幣<br>
             發布者: ${mission.publisher || '未知'}<br>
             時限: ${mission.deadline || '無限制'}<br>
-            接取人數: ${mission.currentAcceptedCount}/${mission.maxAcceptedCount}
+            接取人數: ${currentAcceptedCount}/${maxAcceptedCount}
         </div>
     </div>
     <div class="mission-avatar">
         <img src="${avatarImage}" alt="發布者頭像" class="mission-image" onerror="this.src='images/default-avatar.jpg'">
     </div>
 `;
-        
-        return card;
-    }
+    
+    return card;
+}
     
             // 載入任務列表
     async function loadMissions() {
