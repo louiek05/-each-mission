@@ -262,7 +262,21 @@
             window.location.href = `missions.html?id=${userId}&class=${userClass}`;
         }
 
-       // 載入任務詳情
+        // 添加 getStatusClass 函數（移到這裡）
+function getStatusClass(status) {
+    switch(status) {
+        case '可接取':
+            return 'status-available';
+        case '已額滿':
+            return 'status-unavailable';
+        case '已接取':
+            return 'status-accepted';
+        default:
+            return '';
+    }
+}
+
+// 載入任務詳情
 async function loadMissionDetail() {
     const { missionId, userId } = getUrlParams();
     const missionDetail = document.getElementById('missionDetail');
@@ -293,10 +307,10 @@ async function loadMissionDetail() {
         }
 
         // 計算當前接取人數和上限
-        const currentAcceptedCount = mission.acceptedBy ? 1 : 0;  // 修改這裡
+        const currentAcceptedCount = mission.acceptedBy ? Object.keys(mission.acceptedBy).length : 0;
         const maxAcceptedCount = mission.maxAcceptedCount || 1;
         const isFull = currentAcceptedCount >= maxAcceptedCount;
-        const hasAccepted = mission.acceptedBy === userId;  // 修改這裡
+        const hasAccepted = mission.acceptedBy && mission.acceptedBy[userId];
 
         // 確定任務狀態
         let status = mission.status;
@@ -356,7 +370,7 @@ async function acceptMission() {
             const mission = missionDoc.data();
             
             // 檢查是否已達到人數上限
-            const currentAcceptedCount = mission.acceptedBy ? 1 : 0;  // 修改這裡
+            const currentAcceptedCount = mission.acceptedBy ? Object.keys(mission.acceptedBy).length : 0;
             const maxAcceptedCount = mission.maxAcceptedCount || 1;
             
             if (currentAcceptedCount >= maxAcceptedCount) {
@@ -364,13 +378,13 @@ async function acceptMission() {
             }
             
             // 檢查是否已經接取過
-            if (mission.acceptedBy === userId) {  // 修改這裡
+            if (mission.acceptedBy && mission.acceptedBy[userId]) {
                 throw new Error('你已經接取過此任務了！');
             }
             
             // 更新任務狀態
             transaction.update(missionRef, {
-                acceptedBy: userId,  // 修改這裡
+                [`acceptedBy.${userId}`]: true,
                 [`acceptedAt.${userId}`]: firebase.firestore.FieldValue.serverTimestamp(),
                 status: currentAcceptedCount + 1 >= maxAcceptedCount ? '已額滿' : '可接取'
             });
