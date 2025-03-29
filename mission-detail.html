@@ -363,40 +363,38 @@ async function acceptMission() {
     
     try {
         const missionRef = window.db.collection('missions').doc(missionId);
-        const missionDoc = await missionRef.get();
-        const mission = missionDoc.data();
         
-        // 檢查是否已達到人數上限
-        const currentAcceptedCount = mission.acceptedBy ? Object.keys(mission.acceptedBy).length : 0;
-        const maxAcceptedCount = mission.maxAcceptedCount || 1;
-        
-        if (currentAcceptedCount >= maxAcceptedCount) {
-            alert('此任務已達到接取人數上限！');
-            return;
-        }
-        
-        // 檢查是否已經接取過
-        if (mission.acceptedBy && mission.acceptedBy[userId]) {
-            alert('你已經接取過此任務了！');
-            return;
-        }
-        
-        // 更新任務狀態
-        const updates = {
-            [`acceptedBy.${userId}`]: true,
-            status: currentAcceptedCount + 1 >= maxAcceptedCount ? '已額滿' : '可接取'
-        };
-        
-        // 添加接取時間
-        updates[`acceptedAt.${userId}`] = firebase.firestore.FieldValue.serverTimestamp();
-        
-        await missionRef.update(updates);
+        // 使用事務來確保數據一致性
+        await window.db.runTransaction(async (transaction) => {
+            const missionDoc = await transaction.get(missionRef);
+            const mission = missionDoc.data();
+            
+            // 檢查是否已達到人數上限
+            const currentAcceptedCount = mission.acceptedBy ? Object.keys(mission.acceptedBy).length : 0;
+            const maxAcceptedCount = mission.maxAcceptedCount || 1;
+            
+            if (currentAcceptedCount >= maxAcceptedCount) {
+                throw new Error('此任務已達到接取人數上限！');
+            }
+            
+            // 檢查是否已經接取過
+            if (mission.acceptedBy && mission.acceptedBy[userId]) {
+                throw new Error('你已經接取過此任務了！');
+            }
+            
+            // 更新任務狀態
+            transaction.update(missionRef, {
+                [`acceptedBy.${userId}`]: true,
+                [`acceptedAt.${userId}`]: firebase.firestore.FieldValue.serverTimestamp(),
+                status: currentAcceptedCount + 1 >= maxAcceptedCount ? '已額滿' : '可接取'
+            });
+        });
         
         alert('接取任務成功！');
         loadMissionDetail(); // 重新載入任務詳情
     } catch (error) {
         console.error('Error accepting mission:', error);
-        alert('接取任務時發生錯誤');
+        alert(error.message || '接取任務時發生錯誤');
     }
 }
 
