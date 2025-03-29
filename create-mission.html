@@ -355,14 +355,27 @@
                     return;
                 }
                 
-               missionsList.innerHTML = missions.map(mission => `
+              missionsList.innerHTML = missions.map(mission => {
+    // 計算當前接取人數
+    const currentAcceptedCount = mission.acceptedBy ? Object.keys(mission.acceptedBy).length : 0;
+    const maxAcceptedCount = mission.maxAcceptedCount || 1;
+    
+    // 確定任務狀態
+    let status = mission.status;
+    if (currentAcceptedCount >= maxAcceptedCount) {
+        status = '已額滿';
+    } else if (currentAcceptedCount > 0) {
+        status = '可接取';
+    }
+
+    return `
     <div class="mission-item" data-id="${mission.id}">
         <h3>${mission.title}</h3>
         <p>${mission.description}</p>
         <p>報酬: ${mission.reward}金幣</p>
         <p>截止日期: ${mission.deadline}</p>
-        <p>接取人數: ${mission.acceptedBy ? Object.keys(mission.acceptedBy).length : 0}/${mission.maxAcceptedCount || 1}</p>
-        <p class="mission-status ${getStatusClass(mission.status)}">${mission.status}</p>
+        <p>接取人數: ${currentAcceptedCount}/${maxAcceptedCount}</p>
+        <p class="mission-status ${getStatusClass(status)}">${status}</p>
         
         <!-- 添加接取者列表 -->
         ${mission.acceptedBy && Object.keys(mission.acceptedBy).length > 0 ? `
@@ -404,7 +417,8 @@
             <button class="submit-btn" onclick="updateMission('${mission.id}')">保存修改</button>
         </div>
     </div>
-`).join('');
+`;
+}).join('');
             } catch (error) {
                 console.error('Error loading missions:', error);
                 missionsList.innerHTML = '<div class="loading-message">載入任務時發生錯誤</div>';
