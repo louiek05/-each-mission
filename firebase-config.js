@@ -158,26 +158,41 @@ window.getMissions = async function() {
         console.log('獲取到的任務數量:', snapshot.size);
         
         if (!snapshot.empty) {
-            return snapshot.docs.map(doc => {
+            const missions = [];
+            for (const doc of snapshot.docs) {
                 const data = doc.data();
-                const currentAcceptedCount = data.acceptedBy ? Object.keys(data.acceptedBy).length : 0;
-                const maxAcceptedCount = data.maxAcceptedCount || 1;
+                const missionId = doc.id;
                 
-                return {
-                    id: doc.id,
-                    title: data.title || '未命名任務',
-                    description: data.description || '無描述',
-                    reward: data.reward || 0,
-                    publisher: data.publisher || '未知',
-                    deadline: data.deadline || '無限制',
-                    image: data.image || 'path/to/default-mission-image.jpg',
-                    status: data.status || '可接取',
-                    acceptedBy: data.acceptedBy || {},
-                    maxAcceptedCount: maxAcceptedCount,
-                    currentAcceptedCount: currentAcceptedCount,  // 添加當前接取人數
+                // 如果有接取者，獲取他們的用戶資料
+                if (data.acceptedBy && Object.keys(data.acceptedBy).length > 0) {
+                    const acceptedByData = {};
+                    for (const [acceptedUserId, acceptedData] of Object.entries(data.acceptedBy)) {
+                        try {
+                            const userDoc = await window.db.collection('users').doc(acceptedUserId).get();
+                            if (userDoc.exists) {
+                                const userData = userDoc.data();
+                                acceptedByData[acceptedUserId] = {
+                                    ...acceptedData,
+                                    nickname: userData.nickname || '未知用戶'
+                                };
+                            }
+                        } catch (error) {
+                            console.error('獲取用戶資料失敗:', error);
+                            acceptedByData[acceptedUserId] = {
+                                ...acceptedData,
+                                nickname: '未知用戶'
+                            };
+                        }
+                    }
+                    data.acceptedBy = acceptedByData;
+                }
+                
+                missions.push({
+                    id: missionId,
                     ...data
-                };
-            });
+                });
+            }
+            return missions;
         } else {
             console.log('沒有找到任務');
             return [];
