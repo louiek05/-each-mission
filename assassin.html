@@ -105,20 +105,24 @@
             border-bottom: 2px solid rgba(230, 230, 250, 0.7);
         }
 
-        .avatar {
-            width: 140px;
-            height: 250px;
-            border-radius: 20px;
-            background-color: #E6E6FA;
-            margin: 10px 0;
-            border: 4px solid #C0C0C0;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3),
-                       inset 0 0 15px rgba(0, 0, 0, 0.2);
-            background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="%2300008B" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>');
-            background-size: 80%;
-            background-position: center;
-            background-repeat: no-repeat;
-        }
+       .avatar {
+    width: 140px;
+    height: 250px;
+    border-radius: 20px;
+    background-color: #E6E6FA;
+    margin: 10px 0;
+    border: 4px solid #C0C0C0;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3),
+               inset 0 0 15px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+    position: relative;
+}
+
+.avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
 
         .nickname-container {
             background: transparent;
@@ -468,7 +472,9 @@
         <div class="card-corner corner-bottom-right"></div>
         <div class="card-content">
             <h1 class="card-title">刺客</h1>
-            <div class="avatar"></div>
+            <div class="avatar">
+                <img id="avatarImage" src="images/avatar1.jpg" alt="角色頭像">
+            </div>
             <div class="nickname-container">
                 <div class="nickname" id="nickname">載入中...</div>
             </div>
@@ -515,14 +521,19 @@
                 
                 const db = firebase.firestore();
                 const doc = await db.collection('users').doc(userId).get();
-                
                 if (doc.exists) {
-                    const userData = doc.data();
-                    // 更新頁面內容
-                    document.getElementById('nickname').textContent = userData.nickname || '未設置';
-                    document.getElementById('personality').textContent = userData.personality || '未設置';
-                    document.getElementById('abilities').textContent = userData.abilities || '未設置';
-                    document.getElementById('description').textContent = userData.description || '未設置';
+    const userData = doc.data();
+    // 更新頁面內容
+    document.getElementById('nickname').textContent = userData.nickname || '未設置';
+    document.getElementById('personality').textContent = userData.personality || '未設置';
+    document.getElementById('abilities').textContent = userData.abilities || '未設置';
+    document.getElementById('description').textContent = userData.description || '未設置';
+    
+    // 更新頭像
+    if (userData.avatarUrl) {
+        document.getElementById('avatarImage').src = userData.avatarUrl;
+    }
+}
                 } else {
                     alert('找不到用戶資料');
                 }
