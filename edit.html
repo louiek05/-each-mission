@@ -173,6 +173,40 @@
             background: linear-gradient(135deg, #DAA520, #FFD700);
             transform: translateY(-2px);
         }
+
+        .avatar-selection {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+            justify-content: center;
+        }
+
+        .avatar-option {
+            width: 100px;
+            height: 180px;
+            border: 2px solid #C0C0C0;
+            border-radius: 10px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .avatar-option:hover {
+            transform: scale(1.05);
+            border-color: #FFD700;
+        }
+
+        .avatar-option.selected {
+            border-color: #FFD700;
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+        }
+
+        .avatar-option img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
     </style>
 </head>
 <body>
@@ -180,6 +214,26 @@
         <h1 class="form-title" id="formTitle">修改資料</h1>
         <div class="nickname-display" id="nicknameDisplay">暱稱：載入中...</div>
         <form id="editForm">
+            <div class="form-group">
+                <label>選擇頭像</label>
+                <div class="avatar-selection">
+                    <div class="avatar-option" data-avatar="images/avatar1.jpg">
+                        <img src="images/avatar1.jpg" alt="頭像1">
+                    </div>
+                    <div class="avatar-option" data-avatar="images/avatar2.jpg">
+                        <img src="images/avatar2.jpg" alt="頭像2">
+                    </div>
+                    <div class="avatar-option" data-avatar="images/avatar3.jpg">
+                        <img src="images/avatar3.jpg" alt="頭像3">
+                    </div>
+                    <div class="avatar-option" data-avatar="images/avatar4.jpg">
+                        <img src="images/avatar4.jpg" alt="頭像4">
+                    </div>
+                    <div class="avatar-option" data-avatar="images/avatar5.jpg">
+                        <img src="images/avatar5.jpg" alt="頭像5">
+                    </div>
+                </div>
+            </div>
             <div class="form-group">
                 <label for="personality">性格特質</label>
                 <textarea id="personality" required></textarea>
@@ -235,6 +289,20 @@
             window.location.href = `${userClass}.html?id=${userId}`;
         }
 
+        // 添加頭像選擇相關變量
+        let selectedAvatar = null;
+
+        // 為每個頭像選項添加點擊事件
+        document.querySelectorAll('.avatar-option').forEach(option => {
+            option.addEventListener('click', function() {
+                document.querySelectorAll('.avatar-option').forEach(opt => {
+                    opt.classList.remove('selected');
+                });
+                this.classList.add('selected');
+                selectedAvatar = this.dataset.avatar;
+            });
+        });
+
         // 頁面載入時執行
         window.addEventListener('load', async function() {
             setClassStyle();
@@ -255,12 +323,19 @@
                 
                 if (doc.exists) {
                     const userData = doc.data();
-                    // 顯示暱稱（只讀）
                     document.getElementById('nicknameDisplay').textContent = `暱稱：${userData.nickname || '未設置'}`;
-                    // 填充其他欄位
                     document.getElementById('personality').value = userData.personality || '';
                     document.getElementById('abilities').value = userData.abilities || '';
                     document.getElementById('description').value = userData.description || '';
+                    
+                    // 設置已選擇的頭像
+                    if (userData.avatarUrl) {
+                        const avatarOption = document.querySelector(`.avatar-option[data-avatar="${userData.avatarUrl}"]`);
+                        if (avatarOption) {
+                            avatarOption.classList.add('selected');
+                            selectedAvatar = userData.avatarUrl;
+                        }
+                    }
                 } else {
                     alert('找不到用戶資料');
                 }
@@ -276,12 +351,18 @@
             const { userId } = getUrlParams();
             
             try {
-                const db = firebase.firestore();
-                await db.collection('users').doc(userId).update({
+                const updateData = {
                     personality: document.getElementById('personality').value,
                     abilities: document.getElementById('abilities').value,
                     description: document.getElementById('description').value
-                });
+                };
+                
+                if (selectedAvatar) {
+                    updateData.avatarUrl = selectedAvatar;
+                }
+                
+                const db = firebase.firestore();
+                await db.collection('users').doc(userId).update(updateData);
                 
                 alert('資料更新成功！');
                 goBack();
