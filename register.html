@@ -9,6 +9,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-storage-compat.js"></script>
     <script src="firebase-config.js"></script>
     <style>
         body {
@@ -168,6 +169,40 @@
             margin: 0 auto 10px;
         }
 
+        .avatar-selection {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 10px;
+    justify-content: center;
+}
+
+.avatar-option {
+    width: 100px;
+    height: 180px;
+    border: 2px solid #C0C0C0;
+    border-radius: 10px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.avatar-option:hover {
+    transform: scale(1.05);
+    border-color: #FFD700;
+}
+
+.avatar-option.selected {
+    border-color: #FFD700;
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+.avatar-option img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
@@ -259,6 +294,26 @@
                 <input type="text" id="nickname" required>
             </div>
             <div class="form-group">
+    <label>選擇頭像</label>
+    <div class="avatar-selection">
+        <div class="avatar-option" data-avatar="images/avatar1.jpg">
+            <img src="images/avatar1.jpg" alt="頭像1">
+        </div>
+        <div class="avatar-option" data-avatar="images/avatar2.jpg">
+            <img src="images/avatar2.jpg" alt="頭像2">
+        </div>
+        <div class="avatar-option" data-avatar="images/avatar3.jpg">
+            <img src="images/avatar3.jpg" alt="頭像3">
+        </div>
+        <div class="avatar-option" data-avatar="images/avatar4.jpg">
+            <img src="images/avatar4.jpg" alt="頭像4">
+        </div>
+        <div class="avatar-option" data-avatar="images/avatar5.jpg">
+            <img src="images/avatar5.jpg" alt="頭像5">
+        </div>
+    </div>
+</div>
+            <div class="form-group">
                 <label for="email">電子郵件</label>
                 <input type="email" id="email" required>
             </div>
@@ -294,8 +349,8 @@
 
     <script>
          function setupCharCount(textareaId, countId) {
-        const textarea = document.getElementById(textareaId);
-        const countSpan = document.getElementById(countId);
+         const textarea = document.getElementById(textareaId);
+         const countSpan = document.getElementById(countId);
         
         textarea.addEventListener('input', function() {
             const count = this.value.length;
@@ -314,6 +369,20 @@
     setupCharCount('personality', 'personalityCount');
     setupCharCount('abilities', 'abilitiesCount');
     setupCharCount('description', 'descriptionCount');
+
+        // 添加頭像選擇相關變量
+    let selectedAvatar = null;
+
+        // 為每個頭像選項添加點擊事件
+    document.querySelectorAll('.avatar-option').forEach(option => {
+    option.addEventListener('click', function() {
+    document.querySelectorAll('.avatar-option').forEach(opt => {
+    opt.classList.remove('selected');
+        });
+        this.classList.add('selected');
+        selectedAvatar = this.dataset.avatar;
+    });
+});
         
         // 職業名稱映射
         const classNames = {
@@ -405,15 +474,16 @@
                 const user = userCredential.user;
 
                 // 保存用戶資料到 Firestore
-                const userData = {
-                    nickname: formData.nickname,
-                    email: formData.email,
-                    class: selectedClass,
-                    personality: formData.personality,
-                    abilities: formData.abilities,
-                    description: formData.description,
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                };
+             const userData = {
+             nickname: formData.nickname,
+             email: formData.email,
+             class: selectedClass,
+             personality: formData.personality,
+             abilities: formData.abilities,
+             description: formData.description,
+             avatarUrl: selectedAvatar || 'images/avatar1.jpg', // 如果沒有選擇頭像，使用預設頭像
+             createdAt: firebase.firestore.FieldValue.serverTimestamp()
+           };
 
                 await firebase.firestore().collection('users').doc(user.uid).set(userData);
                 sessionStorage.removeItem('selectedClass');
