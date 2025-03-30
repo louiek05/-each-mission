@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>修改資料 - 勇者之證</title>
+    <link href="https://fonts.googleapis.com/css2?family=ZCOOL+XiaoWei&family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            font-family: 'Noto Sans TC', "Microsoft JhengHei", sans-serif;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* 動態背景顏色 */
+        body.warrior {
+            background: radial-gradient(circle at center, 
+                #FFE4E1 0%,
+                #FFB6C1 20%,
+                #CD5C5C 40%,
+                #B22222 60%,
+                #8B0000 100%
+            );
+        }
+
+        body.mage {
+            background: radial-gradient(circle at center, 
+                #E6E6FA 0%,
+                #B0C4DE 20%,
+                #4169E1 40%,
+                #000080 60%,
+                #00008B 100%
+            );
+        }
+
+        body.assassin {
+            background: radial-gradient(circle at center, 
+                #F0FFF0 0%,
+                #98FB98 20%,
+                #3CB371 40%,
+                #2E8B57 60%,
+                #006400 100%
+            );
+        }
+
+        body.craftsman {
+            background: radial-gradient(circle at center, 
+                #FFF8DC 0%,
+                #FFE4B5 20%,
+                #DAA520 40%,
+                #B8860B 60%,
+                #8B4513 100%
+            );
+        }
+
+        body.traveler {
+            background: radial-gradient(circle at center, 
+                #F0F8FF 0%,
+                #87CEEB 20%,
+                #00BFFF 40%,
+                #1E90FF 60%,
+                #0000CD 100%
+            );
+        }
+
+        .edit-form {
+            background: rgba(0, 0, 0, 0.8);
+            padding: 30px;
+            border-radius: 15px;
+            width: 400px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.3);
+            border: 3px solid #C0C0C0;
+            position: relative;
+            z-index: 1;
+        }
+
+        .form-title {
+            color: #FFD700;
+            text-align: center;
+            font-size: 24px;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .nickname-display {
+            color: #FFD700;
+            font-size: 18px;
+            margin-bottom: 20px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            color: #FFD700;
+            margin-bottom: 8px;
+            font-size: 16px;
+        }
+
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #DEB887;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.9);
+            color: #000;
+            font-size: 16px;
+            box-sizing: border-box;
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, #FFD700, #DAA520);
+            color: #000;
+            border: 2px solid #DEB887;
+            padding: 12px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+
+        .submit-btn:hover {
+            background: linear-gradient(135deg, #DAA520, #FFD700);
+            transform: translateY(-2px);
+        }
+
+        .back-btn {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            background: linear-gradient(135deg, #FFD700, #DAA520);
+            color: #000;
+            border: 2px solid #DEB887;
+            padding: 12px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-family: 'Noto Sans TC', serif;
+            font-weight: 600;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .back-btn:hover {
+            background: linear-gradient(135deg, #DAA520, #FFD700);
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div class="edit-form">
+        <h1 class="form-title" id="formTitle">修改資料</h1>
+        <div class="nickname-display" id="nicknameDisplay">暱稱：載入中...</div>
+        <form id="editForm">
+            <div class="form-group">
+                <label for="personality">性格特質</label>
+                <textarea id="personality" required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="abilities">核心能力</label>
+                <textarea id="abilities" required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="description">個人描述</label>
+                <textarea id="description" required></textarea>
+            </div>
+            <button type="submit" class="submit-btn">保存修改</button>
+        </form>
+    </div>
+
+    <button class="back-btn" onclick="goBack()">返回角色卡片</button>
+
+    <script>
+        // 從 URL 獲取用戶 ID 和職業
+        function getUrlParams() {
+            const params = new URLSearchParams(window.location.search);
+            return {
+                userId: params.get('id'),
+                userClass: params.get('class')
+            };
+        }
+
+        // 設置職業相關的樣式
+        function setClassStyle() {
+            const { userClass } = getUrlParams();
+            if (userClass) {
+                document.body.className = userClass;
+                document.getElementById('formTitle').textContent = `${getClassTitle(userClass)} - 修改資料`;
+            }
+        }
+
+        // 獲取職業標題
+        function getClassTitle(classType) {
+            const titles = {
+                warrior: '戰士',
+                mage: '法師',
+                assassin: '刺客',
+                craftsman: '工匠',
+                traveler: '旅人'
+            };
+            return titles[classType] || '勇者';
+        }
+
+        // 返回角色卡片
+        function goBack() {
+            const { userId, userClass } = getUrlParams();
+            window.location.href = `${userClass}.html?id=${userId}`;
+        }
+
+        // 頁面載入時執行
+        window.addEventListener('load', async function() {
+            setClassStyle();
+            const { userId } = getUrlParams();
+            
+            if (!userId) {
+                alert('無法獲取用戶ID，請重新進入頁面');
+                return;
+            }
+
+            try {
+                if (!firebase.apps.length) {
+                    firebase.initializeApp(window.firebaseConfig);
+                }
+                
+                const db = firebase.firestore();
+                const doc = await db.collection('users').doc(userId).get();
+                
+                if (doc.exists) {
+                    const userData = doc.data();
+                    // 顯示暱稱（只讀）
+                    document.getElementById('nicknameDisplay').textContent = `暱稱：${userData.nickname || '未設置'}`;
+                    // 填充其他欄位
+                    document.getElementById('personality').value = userData.personality || '';
+                    document.getElementById('abilities').value = userData.abilities || '';
+                    document.getElementById('description').value = userData.description || '';
+                } else {
+                    alert('找不到用戶資料');
+                }
+            } catch (error) {
+                console.error('Error loading user data:', error);
+                alert('載入資料時發生錯誤');
+            }
+        });
+
+        // 處理表單提交
+        document.getElementById('editForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const { userId } = getUrlParams();
+            
+            try {
+                const db = firebase.firestore();
+                await db.collection('users').doc(userId).update({
+                    personality: document.getElementById('personality').value,
+                    abilities: document.getElementById('abilities').value,
+                    description: document.getElementById('description').value
+                });
+                
+                alert('資料更新成功！');
+                goBack();
+            } catch (error) {
+                console.error('Error updating user data:', error);
+                alert('更新資料時發生錯誤');
+            }
+        });
+    </script>
+</body>
+</html>
