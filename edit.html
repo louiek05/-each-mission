@@ -14,12 +14,13 @@
         body {
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start;
             min-height: 100vh;
             margin: 0;
+            padding: 20px;
             font-family: 'Noto Sans TC', "Microsoft JhengHei", sans-serif;
             position: relative;
-            overflow: hidden;
+            overflow: auto;
         }
 
         /* 動態背景顏色 */
@@ -74,20 +75,21 @@
         }
 
         .edit-form {
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(255, 253, 240, 0.9);
             padding: 30px;
             border-radius: 15px;
             width: 400px;
             box-shadow: 0 0 20px rgba(0,0,0,0.3);
-            border: 3px solid #C0C0C0;
+            border: 3px solid #8B4513;
             position: relative;
             z-index: 1;
             display: flex;
             flex-direction: column;
+            margin: 20px 0;
         }
 
         .form-title {
-            color: #FFD700;
+            color: #8B4513;
             text-align: center;
             font-size: 24px;
             margin-bottom: 20px;
@@ -95,11 +97,11 @@
         }
 
         .nickname-display {
-            color: #FFD700;
+            color: #8B4513;
             font-size: 18px;
             margin-bottom: 20px;
             padding: 10px;
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(139, 69, 19, 0.1);
             border-radius: 8px;
             text-align: center;
         }
@@ -110,7 +112,7 @@
 
         .form-group label {
             display: block;
-            color: #FFD700;
+            color: #8B4513;
             margin-bottom: 8px;
             font-size: 16px;
         }
@@ -118,7 +120,7 @@
         .form-group textarea {
             width: 100%;
             padding: 10px;
-            border: 2px solid #DEB887;
+            border: 2px solid #8B4513;
             border-radius: 8px;
             background: rgba(255, 255, 255, 0.9);
             color: #000;
@@ -129,8 +131,8 @@
         }
 
         .submit-btn {
-            background: linear-gradient(135deg, #FFD700, #DAA520);
-            color: #000;
+            background: linear-gradient(135deg, #8B4513, #A0522D);
+            color: #FFF;
             border: 2px solid #DEB887;
             padding: 12px 30px;
             border-radius: 25px;
@@ -141,6 +143,8 @@
             transition: all 0.3s ease;
             margin-top: 20px;
             display: block;
+            position: relative;
+            z-index: 2;
         }
 
         .submit-btn:hover {
@@ -152,8 +156,8 @@
             position: fixed;
             bottom: 25px;
             right: 25px;
-            background: linear-gradient(135deg, #FFD700, #DAA520);
-            color: #000;
+            background: linear-gradient(135deg, #8B4513, #A0522D);
+            color: #FFF;
             border: 2px solid #DEB887;
             padding: 12px 25px;
             border-radius: 25px;
