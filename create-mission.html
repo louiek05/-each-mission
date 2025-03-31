@@ -269,6 +269,22 @@
     font-size: 0.9em;
     border: 1px solid #DEB887;
 }
+
+        .mission-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.publisher-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: 2px solid #FFD700;
+    object-fit: cover;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
     </style>
 </head>
 <body>
@@ -369,13 +385,19 @@ async function loadMyMissions() {
             }
 
             return `
-            <div class="mission-item" data-id="${mission.id}">
-                <h3>${mission.title}</h3>
-                <p>${mission.description}</p>
-                <p>報酬: ${mission.reward}金幣</p>
-                <p>截止日期: ${mission.deadline}</p>
-                <p>接取人數: ${currentAcceptedCount}/${maxAcceptedCount}</p>
-                <p class="mission-status ${getStatusClass(status)}">${status}</p>
+<div class="mission-item" data-id="${mission.id}">
+    <div class="mission-header">
+        <img src="${mission.publisherAvatarUrl || 'images/default-avatar.jpg'}" 
+             alt="發布者頭像" 
+             class="publisher-avatar"
+             onerror="this.src='images/default-avatar.jpg'">
+        <h3>${mission.title}</h3>
+    </div>
+    <p>${mission.description}</p>
+    <p>報酬: ${mission.reward}金幣</p>
+    <p>截止日期: ${mission.deadline}</p>
+    <p>接取人數: ${currentAcceptedCount}/${maxAcceptedCount}</p>
+    <p class="mission-status ${getStatusClass(status)}">${status}</p>
                 
                 <!-- 添加接取者列表 -->
                 ${mission.acceptedBy && Object.keys(mission.acceptedBy).length > 0 ? `
@@ -473,50 +495,51 @@ async function loadMyMissions() {
             }
         }
 
-        // 處理任務提交
-        document.getElementById('taskForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            const userId = getUserIdFromUrl();
-            const userClass = new URLSearchParams(window.location.search).get('class');
-            const title = document.getElementById('title').value;
-            const description = document.getElementById('description').value;
-            const reward = document.getElementById('reward').value;
-            const deadline = document.getElementById('deadline').value;
-            const maxAcceptedCount = document.getElementById('maxAcceptedCount').value;
+       // 處理任務提交
+document.getElementById('taskForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const userId = getUserIdFromUrl();
+    const userClass = new URLSearchParams(window.location.search).get('class');
+    const title = document.getElementById('title').value;
+    const description = document.getElementById('description').value;
+    const reward = document.getElementById('reward').value;
+    const deadline = document.getElementById('deadline').value;
+    const maxAcceptedCount = document.getElementById('maxAcceptedCount').value;
 
-            try {
-                // 獲取用戶資料以取得發布者名稱
-                const userDoc = await window.db.collection('users').doc(userId).get();
-                const userData = userDoc.data();
-                const publisher = userData.nickname || '未知用戶';
+    try {
+        // 獲取用戶資料以取得發布者名稱和頭像
+        const userDoc = await window.db.collection('users').doc(userId).get();
+        const userData = userDoc.data();
+        const publisher = userData.nickname || '未知用戶';
+        const publisherAvatarUrl = userData.avatarUrl || 'images/default-avatar.jpg'; // 添加這行
 
-                // 創建任務數據
-                const missionData = {
-                    userId: userId,
-                    userClass: userClass,
-                    title: title,
-                    description: description,
-                    reward: parseInt(reward),
-                    publisher: publisher,
-                    deadline: deadline,
-                    maxAcceptedCount: parseInt(maxAcceptedCount),
-                    acceptedBy: {}, // 用於追蹤接取任務的用戶
-                    status: '可接取' // 初始狀態
-                };
+        // 創建任務數據
+        const missionData = {
+            userId: userId,
+            userClass: userClass,
+            title: title,
+            description: description,
+            reward: parseInt(reward),
+            publisher: publisher,
+            publisherAvatarUrl: publisherAvatarUrl, // 添加這行
+            deadline: deadline,
+            maxAcceptedCount: parseInt(maxAcceptedCount),
+            acceptedBy: {}, // 用於追蹤接取任務的用戶
+            status: '可接取' // 初始狀態
+        };
 
-                // 創建任務
-                await window.createMission(missionData);
-                
-                alert('任務發佈成功！');
-                document.getElementById('taskForm').reset();
-                loadMyMissions(); // 重新載入任務列表
-                
-            } catch (error) {
-                console.error('Error:', error);
-                alert('發佈任務時發生錯誤');
-            }
-
-        });
+        // 創建任務
+        await window.createMission(missionData);
+        
+        alert('任務發佈成功！');
+        document.getElementById('taskForm').reset();
+        loadMyMissions(); // 重新載入任務列表
+        
+    } catch (error) {
+        console.error('Error:', error);
+        alert('發佈任務時發生錯誤');
+    }
+});
 
         // 頁面載入時執行
         document.addEventListener('DOMContentLoaded', function() {
