@@ -315,70 +315,49 @@
                 const urlParams = new URLSearchParams(window.location.search);
                 return urlParams.get('class');
             }
+    // 創建任務卡片
+function createMissionCard(missionId, mission) {
+    const card = document.createElement('div');
+    card.className = 'mission-card';
+    const userId = getUserIdFromUrl();
+    const userClass = getUserClassFromUrl();
     
-         // 創建任務卡片
-    function createMissionCard(missionId, mission) {
-        const card = document.createElement('div');
-        card.className = 'mission-card';
-        const userId = getUserIdFromUrl();
-        const userClass = getUserClassFromUrl();
+    card.onclick = () => {
+        window.location.href = `mission-detail.html?id=${missionId}&userId=${userId}&class=${userClass}`;
+    };
+    
+    // 添加任務狀態樣式
+    let statusHtml = '';
+    if (mission.status) {
+        let statusClass;
+        let statusText = mission.status;
         
-        card.onclick = () => {
-            // 跳轉到任務詳情頁面
-            window.location.href = `mission-detail.html?id=${missionId}&userId=${userId}&class=${userClass}`;
-        };
+        const currentAcceptedCount = mission.acceptedBy ? Object.keys(mission.acceptedBy).length : 0;
+        const maxAcceptedCount = mission.maxAcceptedCount || 1;
         
-        // 添加任務狀態樣式
-        let statusHtml = '';
-        if (mission.status) {
-            let statusClass;
-            let statusText = mission.status;
-            
-            // 檢查是否達到人數上限
-            const currentAcceptedCount = mission.acceptedBy ? Object.keys(mission.acceptedBy).length : 0;
-            const maxAcceptedCount = mission.maxAcceptedCount || 1; // 默認最多1人
-            
-            if (currentAcceptedCount >= maxAcceptedCount) {
-                statusClass = 'status-unavailable';
-                statusText = '已額滿';
-            } else {
-                switch(mission.status) {
-                    case '可接取':
-                        statusClass = 'status-available';
-                        break;
-                    case '已接取':
-                        statusClass = 'status-accepted';
-                        break;
-                    default:
-                        statusClass = 'status-unavailable';
-                }
-            }
-            
-            statusHtml = `<div class="mission-status ${statusClass}">${statusText}</div>`;
-        }
-        
-        // 根據職業選擇對應的頭像
-        let avatarImage = 'images/default-avatar.jpg';
-        if (mission.userClass) {
-            switch(mission.userClass) {
-                case 'warrior':
-                    avatarImage = 'images/warrior-avatar.jpg';
+        if (currentAcceptedCount >= maxAcceptedCount) {
+            statusClass = 'status-unavailable';
+            statusText = '已額滿';
+        } else {
+            switch(mission.status) {
+                case '可接取':
+                    statusClass = 'status-available';
                     break;
-                case 'mage':
-                    avatarImage = 'images/mage-avatar.jpg';
+                case '已接取':
+                    statusClass = 'status-accepted';
                     break;
-                case 'assassin':
-                    avatarImage = 'images/assassin-avatar.jpg';
-                    break;
-                case 'craftsman':
-                    avatarImage = 'images/craftsman-avatar.jpg';
-                    break;
-                case 'traveler':
-                    avatarImage = 'images/traveler-avatar.jpg';
-                    break;
+                default:
+                    statusClass = 'status-unavailable';
             }
         }
-        // 計算當前接取人數和上限
+        
+        statusHtml = `<div class="mission-status ${statusClass}">${statusText}</div>`;
+    }
+    
+    // 使用發布者的頭像
+    const avatarImage = mission.publisherAvatarUrl || 'images/default-avatar.jpg';
+    
+    // 計算當前接取人數和上限
     const currentAcceptedCount = mission.acceptedBy ? Object.keys(mission.acceptedBy).length : 0;
     const maxAcceptedCount = mission.maxAcceptedCount || 1;
     
