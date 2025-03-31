@@ -305,17 +305,8 @@ async function loadMissionDetail() {
         const publisherDoc = await window.db.collection('users').doc(mission.userId).get();
         const publisherData = publisherDoc.data();
         
-        // 根據職業選擇頭像
-        let avatarImage = 'images/default-avatar.jpg';
-        if (mission.userClass) {
-            switch(mission.userClass) {
-                case 'warrior': avatarImage = 'images/warrior-avatar.jpg'; break;
-                case 'mage': avatarImage = 'images/mage-avatar.jpg'; break;
-                case 'assassin': avatarImage = 'images/assassin-avatar.jpg'; break;
-                case 'craftsman': avatarImage = 'images/craftsman-avatar.jpg'; break;
-                case 'traveler': avatarImage = 'images/traveler-avatar.jpg'; break;
-            }
-        }
+        // 使用發布者的頭像，如果沒有則使用預設頭像
+        const avatarImage = mission.publisherAvatarUrl || 'images/avatar1.jpg';
 
         // 計算當前接取人數和上限
         const currentAcceptedCount = mission.acceptedBy ? Object.keys(mission.acceptedBy).length : 0;
@@ -411,80 +402,76 @@ async function acceptMission() {
 
 
         // 載入留言
-        async function loadComments() {
-            const { missionId } = getUrlParams();
-            const commentsList = document.getElementById('commentsList');
-            
-            try {
-                const commentsSnapshot = await window.db.collection('missions')
-                    .doc(missionId)
-                    .collection('comments')
-                    .orderBy('createdAt', 'desc')
-                    .get();
+       // 修改 loadComments 函數中的頭像處理部分
+// 修改 loadComments 函數
+async function loadComments() {
+    const { missionId } = getUrlParams();
+    const commentsList = document.getElementById('commentsList');
+    
+    try {
+        const commentsSnapshot = await window.db.collection('missions')
+            .doc(missionId)
+            .collection('comments')
+            .orderBy('createdAt', 'desc')
+            .get();
 
-                if (commentsSnapshot.empty) {
-                    commentsList.innerHTML = '<div class="loading-message">目前沒有留言</div>';
-                    return;
-                }
-
-                commentsList.innerHTML = '';
-                commentsSnapshot.forEach(doc => {
-                    const comment = doc.data();
-                    const commentElement = document.createElement('div');
-                    commentElement.className = 'comment';
-                    commentElement.innerHTML = `
-                        <div class="comment-header">
-                            <img src="images/${comment.userClass}-avatar.jpg" alt="用戶頭像" class="comment-avatar">
-                            <span class="comment-author">${comment.author}</span>
-                        </div>
-                        <div class="comment-content">${comment.content}</div>
-                    `;
-                    commentsList.appendChild(commentElement);
-                });
-            } catch (error) {
-                console.error('Error loading comments:', error);
-                commentsList.innerHTML = '<div class="loading-message">載入留言時發生錯誤</div>';
-            }
+        if (commentsSnapshot.empty) {
+            commentsList.innerHTML = '<div class="loading-message">目前沒有留言</div>';
+            return;
         }
 
-        // 提交留言
-        document.getElementById('commentForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            const { missionId, userId, userClass } = getUrlParams();
-            const commentInput = this.querySelector('.comment-input');
-            const content = commentInput.value.trim();
-
-            if (!content) return;
-
-            try {
-                // 獲取用戶信息
-                const userDoc = await window.db.collection('users').doc(userId).get();
-                const userData = userDoc.data();
-
-                // 添加留言
-                await window.db.collection('missions')
-                    .doc(missionId)
-                    .collection('comments')
-                    .add({
-                        content: content,
-                        author: userData.nickname || '未知用戶',
-                        userClass: userClass,
-                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                    });
-
-                commentInput.value = '';
-                loadComments();
-            } catch (error) {
-                console.error('Error posting comment:', error);
-                alert('發表留言時發生錯誤');
-            }
+        commentsList.innerHTML = '';
+        commentsSnapshot.forEach(doc => {
+            const comment = doc.data();
+            const commentElement = document.createElement('div');
+            commentElement.className = 'comment';
+            commentElement.innerHTML = `
+                <div class="comment-header">
+                    <img src="${comment.userAvatarUrl || 'images/avatar1.jpg'}" alt="用戶頭像" class="comment-avatar">
+                    <span class="comment-author">${comment.author}</span>
+                </div>
+                <div class="comment-content">${comment.content}</div>
+            `;
+            commentsList.appendChild(commentElement);
         });
+    } catch (error) {
+        console.error('Error loading comments:', error);
+        commentsList.innerHTML = '<div class="loading-message">載入留言時發生錯誤</div>';
+    }
+}
 
-        // 頁面載入時執行
-        document.addEventListener('DOMContentLoaded', function() {
-            loadMissionDetail();
-            loadComments();
-        });
+// 修改提交留言的部分
+document.getElementById('commentForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const { missionId, userId, userClass } = getUrlParams();
+    const commentInput = this.querySelector('.comment-input');
+    const content = commentInput.value.trim();
+
+    if (!content) return;
+
+    try {
+        // 獲取用戶信息
+        const userDoc = await window.db.collection('users').doc(userId).get();
+        const userData = userDoc.data();
+
+        // 添加留言
+        await window.db.collection('missions')
+            .doc(missionId)
+            .collection('comments')
+            .add({
+                content: content,
+                author: userData.nickname || '未知用戶',
+                userAvatarUrl: userData.avatarUrl || 'images/avatar1.jpg',  // 使用用戶的個人頭像
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+
+        commentInput.value = '';
+        loadComments();
+    } catch (error) {
+        console.error('Error posting comment:', error);
+        alert('發表留言時發生錯誤');
+    }
+});
     </script>
 </body>
 </html>
