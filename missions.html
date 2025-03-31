@@ -315,7 +315,7 @@
                 const urlParams = new URLSearchParams(window.location.search);
                 return urlParams.get('class');
             }
-    // 創建任務卡片
+   // 創建任務卡片
 function createMissionCard(missionId, mission) {
     const card = document.createElement('div');
     card.className = 'mission-card';
@@ -354,8 +354,8 @@ function createMissionCard(missionId, mission) {
         statusHtml = `<div class="mission-status ${statusClass}">${statusText}</div>`;
     }
     
-    // 使用發布者的頭像
-    const avatarImage = mission.publisherAvatarUrl || 'images/default-avatar.jpg';
+    // 使用發布者的頭像，如果沒有則使用第一個預設頭像
+    const avatarImage = mission.publisherAvatarUrl || 'images/avatar1.jpg';
     
     // 計算當前接取人數和上限
     const currentAcceptedCount = mission.acceptedBy ? Object.keys(mission.acceptedBy).length : 0;
@@ -376,7 +376,7 @@ function createMissionCard(missionId, mission) {
         </div>
     </div>
     <div class="mission-avatar">
-        <img src="${avatarImage}" alt="發布者頭像" class="mission-image" onerror="this.src='images/default-avatar.jpg'">
+        <img src="${avatarImage}" alt="發布者頭像" class="mission-image">
     </div>
 `;
     
