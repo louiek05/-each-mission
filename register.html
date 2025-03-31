@@ -437,6 +437,12 @@
         // 表單提交處理
         document.getElementById('registerForm').addEventListener('submit', async (e) => {
             e.preventDefault();
+
+            // 添加頭像選擇驗證
+    if (!selectedAvatar) {
+        showError('請選擇一個頭像');
+        return;
+    }
             
             const formData = {
                 nickname: document.getElementById('nickname').value.trim(),
@@ -493,6 +499,14 @@
                 showError(error.message);
             }
         });
+        
+        document.addEventListener('DOMContentLoaded', function() {
+    const firstAvatar = document.querySelector('.avatar-option');
+    if (firstAvatar) {
+        firstAvatar.classList.add('selected');
+        selectedAvatar = firstAvatar.dataset.avatar;
+    }
+});
     </script>
 </body>
 </html>
