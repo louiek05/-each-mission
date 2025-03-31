@@ -387,12 +387,11 @@ async function loadMyMissions() {
             return `
 <div class="mission-item" data-id="${mission.id}">
     <div class="mission-header">
-        <img src="${mission.publisherAvatarUrl || 'images/default-avatar.jpg'}" 
-             alt="發布者頭像" 
-             class="publisher-avatar"
-             onerror="this.src='images/default-avatar.jpg'">
-        <h3>${mission.title}</h3>
-    </div>
+    <img src="${mission.publisherAvatarUrl || 'images/avatar1.jpg'}" 
+         alt="發布者頭像" 
+         class="publisher-avatar">
+    <h3>${mission.title}</h3>
+</div>
     <p>${mission.description}</p>
     <p>報酬: ${mission.reward}金幣</p>
     <p>截止日期: ${mission.deadline}</p>
@@ -511,22 +510,22 @@ document.getElementById('taskForm').addEventListener('submit', async function(e)
         const userDoc = await window.db.collection('users').doc(userId).get();
         const userData = userDoc.data();
         const publisher = userData.nickname || '未知用戶';
-        const publisherAvatarUrl = userData.avatarUrl || 'images/default-avatar.jpg'; // 添加這行
+        const publisherAvatarUrl = userData.avatarUrl || 'images/avatar1.jpg'; // 添加這行
 
         // 創建任務數據
         const missionData = {
-            userId: userId,
-            userClass: userClass,
-            title: title,
-            description: description,
-            reward: parseInt(reward),
-            publisher: publisher,
-            publisherAvatarUrl: publisherAvatarUrl, // 添加這行
-            deadline: deadline,
-            maxAcceptedCount: parseInt(maxAcceptedCount),
-            acceptedBy: {}, // 用於追蹤接取任務的用戶
-            status: '可接取' // 初始狀態
-        };
+    userId: userId,
+    userClass: userClass,
+    title: title,
+    description: description,
+    reward: parseInt(reward),
+    publisher: publisher,
+    publisherAvatarUrl: publisherAvatarUrl,
+    deadline: deadline,
+    maxAcceptedCount: parseInt(maxAcceptedCount),
+    acceptedBy: {},
+    status: '可接取'
+};
 
         // 創建任務
         await window.createMission(missionData);
