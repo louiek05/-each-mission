@@ -234,6 +234,14 @@
             background: linear-gradient(135deg, #FFA500, #FF8C00);
             color: white;
         }
+
+        .comments-section {
+    display: none; /* 默認隱藏留言區 */
+}
+
+.comments-section.visible {
+    display: block; /* 當用戶接取任務後顯示 */
+}
     </style>
 </head>
 <body>
@@ -242,17 +250,19 @@
             <div class="loading-message">載入中...</div>
         </div>
         
-        <div class="comments-section">
-            <h2>留言區</h2>
-            <form class="comment-form" id="commentForm">
-                <textarea class="comment-input" placeholder="寫下你的留言..." required></textarea>
-                <button type="submit" class="submit-comment">發表留言</button>
-            </form>
-            <div class="comments-list" id="commentsList">
-                <div class="loading-message">載入留言中...</div>
-            </div>
-        </div>
+        <div class="comments-section" id="commentsSection">
+    <h2>留言區</h2>
+    <div class="comment-notice" id="commentNotice">
+        <p>請先接取任務後才能查看和發表留言</p>
     </div>
+    <form class="comment-form" id="commentForm" style="display: none;">
+        <textarea class="comment-input" placeholder="寫下你的留言..." required></textarea>
+        <button type="submit" class="submit-comment">發表留言</button>
+    </form>
+    <div class="comments-list" id="commentsList" style="display: none;">
+        <div class="loading-message">載入留言中...</div>
+    </div>
+</div>
 
     <button class="back-btn" onclick="goBack()">返回任務列表</button>
 
@@ -324,6 +334,19 @@ async function loadMissionDetail() {
             status = '可接取';
         }
 
+      // 在這裡添加控制留言區顯示/隱藏的代碼
+const commentsSection = document.getElementById('commentsSection');
+if (hasAccepted) {
+    commentsSection.classList.add('visible');
+    document.getElementById('commentForm').style.display = 'block';
+    document.getElementById('commentsList').style.display = 'block';
+    document.getElementById('commentNotice').style.display = 'none';
+} else {
+    commentsSection.classList.remove('visible');
+    document.getElementById('commentForm').style.display = 'none';
+    document.getElementById('commentsList').style.display = 'none';
+    document.getElementById('commentNotice').style.display = 'block';
+}
         // 生成接取按鈕的 HTML
         let acceptButtonHtml = '';
         if (mission.userId !== userId) { // 不是任務發布者
@@ -359,9 +382,10 @@ async function loadMissionDetail() {
     }
 }
 
-// 添加接取任務的函數
+// 修改 acceptMission 函數
 async function acceptMission() {
     const { missionId, userId } = getUrlParams();
+    const commentsSection = document.getElementById('commentsSection');
     
     try {
         const missionRef = window.db.collection('missions').doc(missionId);
@@ -391,6 +415,12 @@ async function acceptMission() {
                 status: currentAcceptedCount + 1 >= maxAcceptedCount ? '已額滿' : '可接取'
             });
         });
+        
+        // 顯示留言區
+        commentsSection.classList.add('visible');
+        document.getElementById('commentForm').style.display = 'block';
+        document.getElementById('commentsList').style.display = 'block';
+        document.getElementById('commentNotice').style.display = 'none';
         
         alert('接取任務成功！');
         loadMissionDetail(); // 重新載入任務詳情
