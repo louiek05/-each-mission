@@ -326,7 +326,10 @@
     <script>
         // 添加 XSS 防護函數
 function escapeHtml(unsafe) {
-    return unsafe
+    if (unsafe === null || unsafe === undefined) {
+        return '';
+    }
+    return String(unsafe)
         .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;")
@@ -455,7 +458,7 @@ function createMissionCard(missionId, mission) {
         </div>
     </div>
     <div class="mission-avatar">
-        <img src="${escapeHtml(avatarImage)}" alt="發布者頭像" class="mission-image">
+        <img src="${avatarImage}" alt="發布者頭像" class="mission-image">
     </div>
 `;
     
