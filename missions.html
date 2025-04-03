@@ -27,10 +27,11 @@
     }
     
     .container {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 20px;
-    }
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    position: relative;
+}
     
     h1 {
         text-align: center;
@@ -58,25 +59,22 @@
     }
     
     .missions-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-        gap: 25px;
-        padding: 20px;
-    }
-    
-    .mission-card {
-        background: rgba(139, 69, 19, 0.95);
-        border-radius: 20px;
-        overflow: hidden;
-        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
-        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        cursor: pointer;
-        border: 3px solid #DEB887;
-        display: flex;
-        height: 220px;
-        position: relative;
-        backdrop-filter: blur(5px);
-    }
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 25px;
+    padding: 20px;
+    background: rgba(139, 69, 19, 0.7);
+    border: 15px solid #8B4513;
+    border-radius: 10px;
+    box-shadow: 
+        0 0 0 2px #DEB887,
+        0 0 0 4px #8B4513,
+        0 0 0 6px #DEB887,
+        0 0 0 8px #8B4513,
+        0 0 0 10px #DEB887;
+    position: relative;
+    margin-top: 30px;
+}
     
     .mission-card:hover {
         transform: translateY(-8px) scale(1.02);
@@ -142,9 +140,10 @@
         overflow: hidden;
         text-overflow: ellipsis;
         display: -webkit-box;
-        -webkit-line-clamp: 3;
+        -webkit-line-clamp: 4;
         -webkit-box-orient: vertical;
         text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+        margin-bottom: 10px;
     }
     
     .mission-details {
@@ -154,32 +153,6 @@
         padding-top: 15px;
         border-top: 2px solid rgba(222, 184, 135, 0.3);
         line-height: 1.6;
-    }
-    
-    .mission-avatar {
-        width: 160px;
-        height: 100%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: rgba(139, 69, 19, 0.8);
-        border-left: 3px solid #DEB887;
-        padding: 20px;
-    }
-    
-    .mission-image {
-        width: 120px;
-        height: 120px;
-        border-radius: 50%;
-        object-fit: cover;
-        border: 3px solid #FFD700;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-        transition: transform 0.4s ease;
-    }
-    
-    .mission-card:hover .mission-image {
-        transform: scale(1.1);
-        border-color: #FFA500;
     }
     
     .back-btn {
@@ -217,42 +190,128 @@
         text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
         animation: pulse 1.5s infinite;
     }
+           
+            .error-message {
+    color: #ff6b6b;
+    text-align: center;
+    padding: 20px;
+    background: rgba(255, 107, 107, 0.1);
+    border-radius: 10px;
+    margin: 20px 0;
+}
     
     @keyframes pulse {
         0% { opacity: 0.6; }
         50% { opacity: 1; }
         100% { opacity: 0.6; }
     }
+
+@keyframes loading {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.loading-message::before {
+    content: '';
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid #FFD700;
+    border-top-color: transparent;
+    border-radius: 50%;
+    margin-right: 10px;
+    animation: loading 1s linear infinite;
+    vertical-align: middle;
+}
     
-    @media (max-width: 768px) {
-        .missions-grid {
-            grid-template-columns: 1fr;
-            gap: 20px;
-        }
-        
-        .mission-card {
-            height: auto;
-            flex-direction: column;
-        }
-        
-        .mission-avatar {
-            width: 100%;
-            height: 160px;
-            border-left: none;
-            border-bottom: 3px solid #DEB887;
-            padding: 15px;
-        }
-        
-        .mission-image {
-            width: 100px;
-            height: 100px;
-        }
-        
-        .back-btn {
-            bottom: 15px;
-            right: 15px;
-            padding: 8px 20px;
-        }
+.mission-card {
+    background: rgba(139, 69, 19, 0.95);
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    border: 3px solid #DEB887;
+    display: flex;
+    height: 220px;
+    position: relative;
+    backdrop-filter: blur(5px);
+    transform-style: preserve-3d;
+}
+
+    .mission-card:hover .mission-image {
+        transform: scale(1.1);
+        border-color: #FFA500;
+    }
+            
+.mission-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, transparent 45%, rgba(255, 215, 0, 0.1) 50%, transparent 55%);
+    background-size: 200% 200%;
+    animation: shine 3s infinite;
+    pointer-events: none;
+}
+
+@keyframes shine {
+    0% { background-position: 200% 200%; }
+    100% { background-position: -200% -200%; }
+}
+
+.mission-avatar {
+    width: 120px; /* 縮小頭像區域 */
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(139, 69, 19, 0.8);
+    border-left: 3px solid #DEB887;
+    padding: 15px;
+}
+
+.mission-image {
+    width: 90px; /* 縮小頭像尺寸 */
+    height: 90px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #FFD700;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    transition: transform 0.3s ease, border-color 0.3s ease;
+}
+
+/* @media 查詢中只需要覆蓋這些樣式 */
+@media (max-width: 768px) {
+    .missions-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .mission-card {
+        height: auto;
+        flex-direction: column;
+    }
+    
+    .mission-avatar {
+        width: 100%;
+        height: 120px;
+        border-left: none;
+        border-bottom: 3px solid #DEB887;
+        padding: 10px;
+    }
+    
+    .mission-image {
+        width: 80px;
+        height: 80px;
+    }
+    
+    .back-btn {
+        bottom: 15px;
+        right: 15px;
+        padding: 8px 20px;
     }
         </style>
     </head>
@@ -264,58 +323,68 @@
                 <div class="loading-message">載入任務中...</div>
             </div>
         </div>
+    <script>
+        // 添加 XSS 防護函數
+function escapeHtml(unsafe) {
+    return unsafe
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+// 返回個人頁面
+function goBack() {
+    const userId = getUserIdFromUrl();
+    const userClass = getUserClassFromUrl();
+    console.log('當前用戶ID:', userId);
+    console.log('用戶職業:', userClass);
     
-        <script>
-            // 返回個人頁面
-            function goBack() {
-                const userId = getUserIdFromUrl();
-                const userClass = getUserClassFromUrl();
-                console.log('當前用戶ID:', userId);
-                console.log('用戶職業:', userClass);
-                
-                if (userId) {
-                    let url;
-                    switch(userClass) {
-                        case 'assassin':
-                            url = 'assassin.html';
-                            break;
-                        case 'craftsman':
-                            url = 'craftsman.html';
-                            break;
-                        case 'traveler':
-                            url = 'traveler.html';
-                            break;
-                        case 'warrior':
-                            url = 'warrior.html';
-                            break;
-                        case 'mage':
-                            url = 'mage.html';
-                            break;
-                        default:
-                            url = 'index.html';
-                    }
-                    
-                    url += `?id=${encodeURIComponent(userId)}`;
-                    console.log('跳轉到:', url);
-                    window.location.href = url;
-                } else {
-                    console.log('未找到用戶ID，返回首頁');
-                    window.location.href = 'index.html';
-                }
-            }
-    
-            // 從 URL 獲取用戶 ID
-            function getUserIdFromUrl() {
-                const urlParams = new URLSearchParams(window.location.search);
-                return urlParams.get('id');
-            }
-    
-            // 從 URL 獲取用戶職業
-            function getUserClassFromUrl() {
-                const urlParams = new URLSearchParams(window.location.search);
-                return urlParams.get('class');
-            }
-   // 創建任務卡片
+    if (userId) {
+        let url;
+        switch(userClass) {
+            case 'assassin':
+                url = 'assassin.html';
+                break;
+            case 'craftsman':
+                url = 'craftsman.html';
+                break;
+            case 'traveler':
+                url = 'traveler.html';
+                break;
+            case 'warrior':
+                url = 'warrior.html';
+                break;
+            case 'mage':
+                url = 'mage.html';
+                break;
+            default:
+                url = 'index.html';
+        }
+        
+        url += `?id=${encodeURIComponent(userId)}`;
+        console.log('跳轉到:', url);
+        window.location.href = url;
+    } else {
+        console.log('未找到用戶ID，返回首頁');
+        window.location.href = 'index.html';
+    }
+}
+
+// 從 URL 獲取用戶 ID
+function getUserIdFromUrl() {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get('id');
+}
+
+// 從 URL 獲取用戶職業
+function getUserClassFromUrl() {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get('class');
+}
+
+// 創建任務卡片
 function createMissionCard(missionId, mission) {
     const card = document.createElement('div');
     card.className = 'mission-card';
@@ -357,6 +426,16 @@ function createMissionCard(missionId, mission) {
     // 使用發布者的頭像，如果沒有則使用第一個預設頭像
     const avatarImage = mission.publisherAvatarUrl || 'images/avatar1.jpg';
     
+    // 預加載圖片
+    const img = new Image();
+    img.src = avatarImage;
+    img.onload = () => {
+        const missionImage = card.querySelector('.mission-image');
+        if (missionImage) {
+            missionImage.src = avatarImage;
+        }
+    };
+    
     // 計算當前接取人數和上限
     const currentAcceptedCount = mission.acceptedBy ? Object.keys(mission.acceptedBy).length : 0;
     const maxAcceptedCount = mission.maxAcceptedCount || 1;
@@ -365,18 +444,18 @@ function createMissionCard(missionId, mission) {
     ${statusHtml}
     <div class="mission-info">
         <div>
-            <div class="mission-title">${mission.title || '未命名任務'}</div>
-            <div class="mission-description">${mission.description || '無描述'}</div>
+            <div class="mission-title">${escapeHtml(mission.title || '未命名任務')}</div>
+            <div class="mission-description">${escapeHtml(mission.description || '無描述')}</div>
         </div>
         <div class="mission-details">
-            報酬: ${mission.reward || '0'}金幣<br>
-            發布者: ${mission.publisher || '未知'}<br>
-            時限: ${mission.deadline || '無限制'}<br>
+            報酬: ${escapeHtml(mission.reward || '0')}金幣<br>
+            發布者: ${escapeHtml(mission.publisher || '未知')}<br>
+            時限: ${escapeHtml(mission.deadline || '無限制')}<br>
             接取人數: ${currentAcceptedCount}/${maxAcceptedCount}
         </div>
     </div>
     <div class="mission-avatar">
-        <img src="${avatarImage}" alt="發布者頭像" class="mission-image">
+        <img src="${escapeHtml(avatarImage)}" alt="發布者頭像" class="mission-image">
     </div>
 `;
     
