@@ -336,7 +336,7 @@ async function loadMissionDetail() {
 
       // 在這裡添加控制留言區顯示/隱藏的代碼
 const commentsSection = document.getElementById('commentsSection');
-if (hasAccepted) {
+if (hasAccepted || mission.userId === userId) {
     commentsSection.classList.add('visible');
     document.getElementById('commentForm').style.display = 'block';
     document.getElementById('commentsList').style.display = 'block';
