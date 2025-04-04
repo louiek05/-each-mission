@@ -250,6 +250,32 @@ h1::after {
     transition: transform 0.3s ease;
 }
 
+.rules-btn {
+    position: fixed;
+    bottom: 25px;
+    left: 25px;  /* 放在左邊，與返回按鈕對稱 */
+    background: linear-gradient(135deg, #8B4513, #A0522D);
+    color: #FFD700;
+    border: 2px solid #DEB887;
+    padding: 12px 25px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-family: 'Noto Serif TC', serif;
+    font-weight: 600;
+    font-size: 1.1em;
+    transition: all 0.3s ease;
+    z-index: 1000;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.rules-btn:hover {
+    background: linear-gradient(135deg, #A0522D, #8B4513);
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+    border-color: #FFD700;
+}
+
 @media (max-width: 768px) {
     .missions-grid {
         grid-template-columns: 1fr;
@@ -284,6 +310,7 @@ h1::after {
     </head>
     <body>
         <button class="back-btn" onclick="goBack()">返回個人頁面</button>
+        <button class="rules-btn" onclick="window.location.href='mission-rules.html'">任務須知</button>
         <div class="container">
             <h1>任務公佈欄</h1>
             <div class="missions-grid" id="missionsGrid">
