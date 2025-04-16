@@ -102,6 +102,216 @@
             margin: 20px 0;
             font-size: 1.1em;
         }
+
+        /* 行動裝置適配 (手機) */
+@media screen and (max-width: 768px) {
+    .container {
+        width: 95%;
+        padding: 20px;
+        margin: 10px;
+        max-height: 85vh;
+    }
+
+    h1 {
+        font-size: 1.8em;
+        margin-bottom: 20px;
+    }
+
+    .class-option {
+        padding: 15px;
+        margin: 12px 0;
+    }
+
+    .class-option h3 {
+        font-size: 1.3em;
+    }
+
+    .class-option p {
+        font-size: 1em;
+        line-height: 1.4;
+    }
+
+    .selected-traits {
+        font-size: 1em;
+        margin: 15px 0;
+        padding: 0 10px;
+    }
+
+    .btn {
+        padding: 10px 20px;
+        font-size: 1.1em;
+        margin: 8px auto;
+        max-width: 250px;
+    }
+}
+
+/* 平板裝置適配 */
+@media screen and (min-width: 769px) and (max-width: 1024px) {
+    .container {
+        width: 90%;
+        padding: 25px;
+    }
+
+    h1 {
+        font-size: 2.2em;
+    }
+
+    .class-option {
+        padding: 18px;
+    }
+
+    .class-option h3 {
+        font-size: 1.4em;
+    }
+
+    .class-option p {
+        font-size: 1.05em;
+    }
+
+    .selected-traits {
+        font-size: 1.1em;
+    }
+}
+
+/* 確保在各種螢幕尺寸下的顯示效果 */
+@media screen and (max-width: 1024px) {
+    body {
+        padding: 10px;
+    }
+
+    /* 優化觸控操作 */
+    .class-option,
+    .btn {
+        touch-action: manipulation;
+    }
+
+    .class-option:active {
+        transform: scale(0.98);
+    }
+
+    /* 改善滾動體驗 */
+    .container {
+        -webkit-overflow-scrolling: touch;
+    }
+}
+
+/* 處理超小螢幕裝置 */
+@media screen and (max-width: 320px) {
+    .container {
+        width: 98%;
+        padding: 15px;
+    }
+
+    h1 {
+        font-size: 1.5em;
+        margin-bottom: 15px;
+    }
+
+    .class-option {
+        padding: 12px;
+        margin: 10px 0;
+    }
+
+    .class-option h3 {
+        font-size: 1.2em;
+    }
+
+    .class-option p {
+        font-size: 0.9em;
+    }
+
+    .selected-traits {
+        font-size: 0.9em;
+        margin: 12px 0;
+    }
+
+    .btn {
+        padding: 8px 16px;
+        font-size: 1em;
+    }
+}
+
+/* 處理橫向模式 */
+@media screen and (max-height: 500px) and (orientation: landscape) {
+    .container {
+        max-height: 90vh;
+        margin: 5px auto;
+    }
+
+    h1 {
+        margin-bottom: 15px;
+    }
+
+    .class-option {
+        margin: 10px 0;
+    }
+
+    .selected-traits {
+        margin: 10px 0;
+    }
+}
+
+/* 優化高解析度螢幕顯示 */
+@media screen and (min-width: 1920px) {
+    .container {
+        max-width: 1000px;
+    }
+
+    h1 {
+        font-size: 3em;
+    }
+
+    .class-option {
+        padding: 25px;
+    }
+
+    .class-option h3 {
+        font-size: 1.8em;
+    }
+
+    .class-option p {
+        font-size: 1.3em;
+    }
+
+    .selected-traits {
+        font-size: 1.3em;
+    }
+
+    .btn {
+        font-size: 1.4em;
+        max-width: 350px;
+    }
+}
+
+/* 深色模式支援 */
+@media (prefers-color-scheme: dark) {
+    .container {
+        background: rgba(139, 69, 19, 0.95);
+    }
+
+    .class-option {
+        background: rgba(139, 69, 19, 0.9);
+    }
+
+    .class-option:hover {
+        background: rgba(139, 69, 19, 1);
+    }
+}
+
+/* 優化動畫效果 */
+@media (prefers-reduced-motion: reduce) {
+    .class-option {
+        transition: none;
+    }
+
+    .class-option:hover {
+        transform: none;
+    }
+
+    .btn:hover {
+        transform: none;
+    }
+}
     </style>
 </head>
 <body>
