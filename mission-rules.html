@@ -91,6 +91,171 @@
             box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
             border-color: #FFD700;
         }
+
+        /* 行動裝置適配 (手機) */
+@media screen and (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+
+    .container {
+        width: 95%;
+        padding: 20px;
+        margin: 10px auto;
+    }
+
+    h1 {
+        font-size: 1.8em;
+        margin-bottom: 25px;
+    }
+
+    .rule-item {
+        margin-bottom: 20px;
+        padding: 15px;
+        padding-left: 45px;
+    }
+
+    .rule-item::before {
+        left: 15px;
+        font-size: 1.2em;
+    }
+
+    .rule-text {
+        font-size: 1em;
+        line-height: 1.4;
+    }
+
+    .back-btn {
+        bottom: 15px;
+        right: 15px;
+        padding: 10px 20px;
+        font-size: 1em;
+    }
+}
+
+/* 平板裝置適配 */
+@media screen and (min-width: 769px) and (max-width: 1024px) {
+    .container {
+        width: 90%;
+        padding: 30px;
+    }
+
+    h1 {
+        font-size: 2.2em;
+        margin-bottom: 35px;
+    }
+
+    .rule-item {
+        margin-bottom: 25px;
+        padding: 18px;
+        padding-left: 55px;
+    }
+
+    .rule-text {
+        font-size: 1.1em;
+    }
+
+    .back-btn {
+        padding: 11px 22px;
+        font-size: 1.05em;
+    }
+}
+
+/* 確保在各種螢幕尺寸下的顯示效果 */
+@media screen and (max-width: 1024px) {
+    /* 優化觸控操作 */
+    .back-btn {
+        touch-action: manipulation;
+        min-height: 44px;
+    }
+
+    .back-btn:active {
+        transform: scale(0.95);
+    }
+
+    /* 改善陰影效果 */
+    .container {
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.4);
+    }
+
+    /* 優化規則項目的觸控區域 */
+    .rule-item {
+        touch-action: manipulation;
+    }
+
+    /* 改善背景漸層效果 */
+    body {
+        background-attachment: fixed;
+    }
+}
+
+/* 處理超小螢幕裝置 */
+@media screen and (max-width: 320px) {
+    .container {
+        padding: 15px;
+    }
+
+    h1 {
+        font-size: 1.5em;
+        margin-bottom: 20px;
+    }
+
+    .rule-item {
+        margin-bottom: 15px;
+        padding: 12px;
+        padding-left: 40px;
+    }
+
+    .rule-item::before {
+        left: 12px;
+        font-size: 1em;
+    }
+
+    .rule-text {
+        font-size: 0.9em;
+    }
+
+    .back-btn {
+        padding: 8px 16px;
+        font-size: 0.9em;
+    }
+}
+
+/* 處理橫向模式 */
+@media screen and (max-height: 500px) and (orientation: landscape) {
+    .container {
+        margin: 10px auto 60px;
+    }
+
+    .rules-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 15px;
+    }
+
+    .rule-item {
+        margin-bottom: 0;
+    }
+
+    h1 {
+        margin-bottom: 20px;
+    }
+}
+
+/* 優化高解析度螢幕顯示 */
+@media screen and (min-width: 1920px) {
+    .container {
+        max-width: 1000px;
+    }
+
+    h1 {
+        font-size: 3em;
+    }
+
+    .rule-text {
+        font-size: 1.4em;
+    }
+}
     </style>
 </head>
 <body>
