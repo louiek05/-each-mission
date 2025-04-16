@@ -373,6 +373,251 @@
             right: 5px;
             transform: rotate(135deg);
         }
+
+        /* 行動裝置適配 (手機) */
+@media screen and (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+
+    .adventure-card {
+        width: 300px;
+        height: auto;
+        min-height: 500px;
+        padding: 15px;
+    }
+
+    .card-title {
+        font-size: 20px;
+        padding: 5px 30px;
+        letter-spacing: 3px;
+    }
+
+    .avatar {
+        width: 120px;
+        height: 200px;
+    }
+
+    .nickname {
+        font-size: 18px;
+    }
+
+    .attributes {
+        padding: 10px;
+        min-height: 100px;
+    }
+
+    .attribute {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        padding: 5px;
+    }
+
+    .attribute strong {
+        width: auto;
+        font-size: 16px;
+        padding-top: 3px;
+        margin-bottom: 5px;
+    }
+
+    .attribute-content {
+        font-size: 14px;
+        margin-left: 0;
+        padding-top: 0;
+        text-align: center;
+    }
+
+    .motto {
+        font-size: 14px;
+        margin-top: 15px;
+    }
+
+    .button-container {
+        position: fixed;
+        bottom: 20px;
+        right: 50%;
+        transform: translateX(50%);
+        top: auto;
+        flex-direction: row;
+        gap: 10px;
+    }
+
+    .btn {
+        padding: 8px 15px;
+        font-size: 16px;
+        width: auto;
+        min-width: 90px;
+    }
+
+    .card-corner {
+        width: 20px;
+        height: 20px;
+        font-size: 18px;
+    }
+}
+
+/* 平板裝置適配 */
+@media screen and (min-width: 769px) and (max-width: 1024px) {
+    .adventure-card {
+        width: 320px;
+        height: 520px;
+    }
+
+    .card-title {
+        font-size: 22px;
+        padding: 5px 40px;
+    }
+
+    .avatar {
+        width: 130px;
+        height: 220px;
+    }
+
+    .attributes {
+        padding: 12px;
+    }
+
+    .attribute strong {
+        font-size: 17px;
+        width: 90px;
+    }
+
+    .attribute-content {
+        font-size: 15px;
+    }
+
+    .button-container {
+        right: 15px;
+    }
+
+    .btn {
+        width: 110px;
+        font-size: 17px;
+    }
+}
+
+/* 處理橫向模式 */
+@media screen and (max-height: 600px) and (orientation: landscape) {
+    .adventure-card {
+        height: auto;
+        min-height: 450px;
+        margin: 20px 0;
+    }
+
+    .avatar {
+        width: 100px;
+        height: 170px;
+        margin: 5px 0;
+    }
+
+    .attributes {
+        min-height: 90px;
+    }
+
+    .motto {
+        margin-top: 10px;
+    }
+}
+
+/* 超小螢幕裝置適配 */
+@media screen and (max-width: 320px) {
+    .adventure-card {
+        width: 280px;
+        padding: 10px;
+    }
+
+    .card-title {
+        font-size: 18px;
+        padding: 5px 20px;
+    }
+
+    .avatar {
+        width: 100px;
+        height: 180px;
+    }
+
+    .nickname {
+        font-size: 16px;
+    }
+
+    .attribute strong {
+        font-size: 15px;
+    }
+
+    .attribute-content {
+        font-size: 13px;
+    }
+
+    .btn {
+        padding: 6px 12px;
+        font-size: 14px;
+        min-width: 80px;
+    }
+
+    .button-container {
+        gap: 5px;
+    }
+}
+
+/* 高解析度螢幕優化 */
+@media screen and (min-width: 1920px) {
+    .adventure-card {
+        width: 400px;
+        height: 600px;
+    }
+
+    .card-title {
+        font-size: 28px;
+    }
+
+    .avatar {
+        width: 160px;
+        height: 280px;
+    }
+
+    .attribute strong {
+        font-size: 20px;
+        width: 120px;
+    }
+
+    .attribute-content {
+        font-size: 18px;
+    }
+
+    .motto {
+        font-size: 18px;
+    }
+
+    .btn {
+        width: 140px;
+        font-size: 20px;
+    }
+}
+
+/* 深色模式支援 */
+@media (prefers-color-scheme: dark) {
+    .adventure-card {
+        background: rgba(74, 20, 140, 0.95);
+    }
+
+    .attribute-content,
+    .nickname,
+    .card-title {
+        color: #F3E5F5;
+    }
+}
+
+/* 優化動畫效果 */
+@media (prefers-reduced-motion: reduce) {
+    .btn:hover {
+        transform: none;
+    }
+
+    body::before {
+        animation: none;
+    }
+}
        </style>
 </head>
 <body>
