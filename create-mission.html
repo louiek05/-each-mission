@@ -285,6 +285,173 @@
     object-fit: cover;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
+
+        /* 行動裝置適配 (手機) */
+@media screen and (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+
+    .container {
+        padding: 15px;
+        width: 95%;
+        margin: 10px auto;
+    }
+
+    .inspiration-text {
+        font-size: 16px;
+        padding: 15px;
+        width: 95%;
+    }
+
+    .form-group {
+        width: 100%;
+        margin-bottom: 15px;
+    }
+
+    .form-group input, 
+    .form-group textarea {
+        padding: 10px;
+        font-size: 14px;
+    }
+
+    .submit-btn {
+        padding: 10px 20px;
+        font-size: 14px;
+    }
+
+    .back-btn {
+        bottom: 15px;
+        right: 15px;
+        padding: 8px 15px;
+        font-size: 14px;
+    }
+
+    .mission-list {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .mission-item {
+        padding: 15px;
+    }
+
+    .mission-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .publisher-avatar {
+        width: 40px;
+        height: 40px;
+    }
+
+    .mission-actions {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .edit-btn, 
+    .delete-btn {
+        width: 100%;
+        padding: 10px;
+    }
+
+    .accepted-users {
+        padding: 8px;
+    }
+
+    .user-tag {
+        font-size: 12px;
+        padding: 3px 8px;
+    }
+
+    .my-missions h2 {
+        font-size: 1.5em;
+    }
+}
+
+/* 平板裝置適配 */
+@media screen and (min-width: 769px) and (max-width: 1024px) {
+    .container {
+        width: 90%;
+        padding: 20px;
+    }
+
+    .inspiration-text {
+        width: 95%;
+        font-size: 17px;
+    }
+
+    .form-group {
+        width: 95%;
+    }
+
+    .mission-list {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+    }
+
+    .mission-item {
+        padding: 18px;
+    }
+
+    .mission-header {
+        gap: 12px;
+    }
+
+    .publisher-avatar {
+        width: 45px;
+        height: 45px;
+    }
+
+    .edit-btn, 
+    .delete-btn {
+        padding: 8px 15px;
+    }
+
+    .back-btn {
+        bottom: 20px;
+        right: 20px;
+        padding: 10px 20px;
+        font-size: 15px;
+    }
+
+    .my-missions h2 {
+        font-size: 1.6em;
+    }
+
+    .user-tag {
+        font-size: 13px;
+        padding: 4px 10px;
+    }
+}
+
+/* 確保表單在各種螢幕尺寸下都能正常顯示 */
+@media screen and (max-width: 1024px) {
+    .edit-form {
+        margin-top: 10px;
+    }
+
+    .edit-form .form-group {
+        margin-bottom: 12px;
+    }
+
+    .edit-form input,
+    .edit-form textarea {
+        font-size: 14px;
+    }
+
+    .mission-status {
+        font-size: 0.8em;
+        padding: 4px 12px;
+    }
+
+    .attribute-content {
+        font-size: 14px;
+    }
+}
     </style>
 </head>
 <body>
