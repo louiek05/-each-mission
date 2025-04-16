@@ -206,6 +206,203 @@
             text-align: center;
             margin-top: 30px;
         }
+
+        /* 行動裝置適配 (手機) */
+@media screen and (max-width: 768px) {
+    .container {
+        width: 95%;
+        padding: 20px;
+        margin: 10px;
+        max-height: 85vh;
+    }
+
+    h1 {
+        font-size: 1.8em;
+        margin-bottom: 20px;
+    }
+
+    .description {
+        font-size: 1em;
+        margin-bottom: 20px;
+        padding: 0 10px;
+    }
+
+    .traits-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+        padding: 0 10px;
+    }
+
+    .trait-btn {
+        padding: 12px;
+        font-size: 0.9em;
+        min-height: 50px;
+    }
+
+    .selected-count {
+        font-size: 1em;
+        margin: 15px 0;
+    }
+
+    .btn {
+        padding: 10px 20px;
+        font-size: 1em;
+        margin: 8px auto;
+    }
+
+    .class-option {
+        padding: 15px;
+        margin: 10px 0;
+    }
+
+    .class-option h3 {
+        font-size: 1.2em;
+    }
+
+    .class-option p {
+        font-size: 0.9em;
+    }
+
+    .class-btn {
+        padding: 12px 20px;
+        font-size: 1em;
+        margin: 8px;
+        width: 90%;
+    }
+}
+
+/* 平板裝置適配 */
+@media screen and (min-width: 769px) and (max-width: 1024px) {
+    .container {
+        width: 85%;
+        padding: 25px;
+    }
+
+    .traits-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+    }
+
+    h1 {
+        font-size: 2.2em;
+    }
+
+    .description {
+        font-size: 1.1em;
+    }
+
+    .trait-btn {
+        font-size: 1em;
+        min-height: 55px;
+    }
+
+    .btn {
+        font-size: 1.1em;
+    }
+}
+
+/* 確保在各種螢幕尺寸下的顯示效果 */
+@media screen and (max-width: 1024px) {
+    body {
+        padding: 10px;
+    }
+
+    /* 優化觸控操作 */
+    .trait-btn,
+    .btn,
+    .class-btn {
+        touch-action: manipulation;
+    }
+
+    .trait-btn:active,
+    .btn:active,
+    .class-btn:active {
+        transform: scale(0.95);
+    }
+
+    /* 改善滾動體驗 */
+    .container {
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* 優化陰影效果 */
+    .container {
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.4);
+    }
+}
+
+/* 處理超小螢幕裝置 */
+@media screen and (max-width: 320px) {
+    .container {
+        padding: 15px;
+    }
+
+    h1 {
+        font-size: 1.5em;
+    }
+
+    .traits-grid {
+        grid-template-columns: repeat(1, 1fr);
+    }
+
+    .trait-btn {
+        font-size: 0.85em;
+        min-height: 45px;
+    }
+
+    .selected-count {
+        font-size: 0.9em;
+    }
+
+    .btn {
+        font-size: 0.9em;
+        padding: 8px 16px;
+    }
+}
+
+/* 處理橫向模式 */
+@media screen and (max-height: 500px) and (orientation: landscape) {
+    .container {
+        max-height: 90vh;
+        margin: 10px auto;
+    }
+
+    .traits-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 8px;
+    }
+
+    h1 {
+        margin-bottom: 15px;
+    }
+
+    .description {
+        margin-bottom: 15px;
+    }
+}
+
+/* 優化高解析度螢幕顯示 */
+@media screen and (min-width: 1920px) {
+    .container {
+        max-width: 1000px;
+    }
+
+    .traits-grid {
+        grid-template-columns: repeat(6, 1fr);
+    }
+
+    .trait-btn {
+        font-size: 1.2em;
+    }
+
+    h1 {
+        font-size: 3em;
+    }
+
+    .description {
+        font-size: 1.4em;
+    }
+}
     </style>
 </head>
 <body>
