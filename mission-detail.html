@@ -242,6 +242,213 @@
 .comments-section.visible {
     display: block; /* 當用戶接取任務後顯示 */
 }
+
+        /* 行動裝置適配 (手機) */
+@media screen and (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+
+    .container {
+        width: 100%;
+        padding: 10px;
+    }
+
+    .mission-detail {
+        padding: 15px;
+        margin-bottom: 20px;
+    }
+
+    .mission-header {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .mission-avatar {
+        width: 100px;
+        height: 100px;
+        margin: 0 auto 15px;
+    }
+
+    .mission-title {
+        font-size: 1.5em;
+    }
+
+    .mission-description {
+        font-size: 1em;
+    }
+
+    .mission-meta {
+        font-size: 0.9em;
+    }
+
+    .comments-section {
+        padding: 15px;
+    }
+
+    .comment-input {
+        padding: 10px;
+        font-size: 14px;
+        min-height: 80px;
+    }
+
+    .submit-comment {
+        width: 100%;
+        padding: 10px;
+        font-size: 14px;
+    }
+
+    .comment {
+        padding: 10px;
+    }
+
+    .comment-avatar {
+        width: 30px;
+        height: 30px;
+    }
+
+    .comment-author {
+        font-size: 0.9em;
+    }
+
+    .comment-content {
+        font-size: 0.9em;
+    }
+
+    .back-btn {
+        bottom: 15px;
+        right: 15px;
+        padding: 8px 20px;
+        font-size: 1em;
+    }
+
+    .accept-btn {
+        width: 100%;
+        padding: 10px;
+        font-size: 14px;
+        margin-top: 15px;
+    }
+
+    .mission-status {
+        font-size: 0.8em;
+        padding: 4px 12px;
+    }
+}
+
+/* 平板裝置適配 */
+@media screen and (min-width: 769px) and (max-width: 1024px) {
+    .container {
+        width: 90%;
+        padding: 15px;
+    }
+
+    .mission-detail {
+        padding: 25px;
+    }
+
+    .mission-avatar {
+        width: 110px;
+        height: 110px;
+    }
+
+    .mission-title {
+        font-size: 1.8em;
+    }
+
+    .mission-description {
+        font-size: 1.1em;
+    }
+
+    .comments-section {
+        padding: 25px;
+    }
+
+    .comment-input {
+        font-size: 15px;
+    }
+
+    .submit-comment {
+        font-size: 15px;
+    }
+}
+
+/* 確保在各種螢幕尺寸下的顯示效果 */
+@media screen and (max-width: 1024px) {
+    /* 優化觸控操作 */
+    .submit-comment,
+    .accept-btn,
+    .back-btn {
+        touch-action: manipulation;
+        min-height: 44px;
+    }
+
+    .submit-comment:active,
+    .accept-btn:active,
+    .back-btn:active {
+        transform: scale(0.95);
+    }
+
+    /* 改善表單元素的可用性 */
+    .comment-input {
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+    }
+
+    /* 優化滾動體驗 */
+    .container {
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* 改善陰影效果 */
+    .mission-detail,
+    .comments-section {
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+}
+
+/* 處理超小螢幕裝置 */
+@media screen and (max-width: 320px) {
+    .mission-title {
+        font-size: 1.3em;
+    }
+
+    .mission-description {
+        font-size: 0.9em;
+    }
+
+    .mission-meta {
+        font-size: 0.8em;
+    }
+
+    .comment-input {
+        min-height: 60px;
+    }
+
+    .submit-comment,
+    .accept-btn {
+        padding: 8px 15px;
+        font-size: 13px;
+    }
+}
+
+/* 處理橫向模式 */
+@media screen and (max-height: 500px) and (orientation: landscape) {
+    .container {
+        margin-top: 10px;
+        margin-bottom: 60px;
+    }
+
+    .mission-header {
+        flex-direction: row;
+        align-items: flex-start;
+    }
+
+    .mission-avatar {
+        margin-right: 15px;
+        margin-bottom: 0;
+    }
+}
     </style>
 </head>
 <body>
