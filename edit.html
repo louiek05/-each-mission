@@ -207,6 +207,156 @@
             height: 100%;
             object-fit: cover;
         }
+/* 行動裝置適配 (手機) */
+@media screen and (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+
+    .edit-form {
+        width: 95%;
+        padding: 20px;
+        margin: 10px auto;
+    }
+
+    .form-title {
+        font-size: 20px;
+        margin-bottom: 15px;
+    }
+
+    .nickname-display {
+        font-size: 16px;
+        padding: 8px;
+        margin-bottom: 15px;
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    .form-group label {
+        font-size: 14px;
+        margin-bottom: 5px;
+    }
+
+    .form-group textarea {
+        padding: 8px;
+        font-size: 14px;
+        min-height: 80px;
+    }
+
+    .avatar-selection {
+        gap: 8px;
+    }
+
+    .avatar-option {
+        width: 80px;
+        height: 140px;
+    }
+
+    .submit-btn {
+        padding: 10px 20px;
+        font-size: 14px;
+        margin-top: 15px;
+    }
+
+    .back-btn {
+        bottom: 15px;
+        right: 15px;
+        padding: 8px 20px;
+        font-size: 14px;
+    }
+}
+
+/* 平板裝置適配 */
+@media screen and (min-width: 769px) and (max-width: 1024px) {
+    .edit-form {
+        width: 80%;
+        max-width: 600px;
+        padding: 25px;
+    }
+
+    .form-title {
+        font-size: 22px;
+    }
+
+    .nickname-display {
+        font-size: 17px;
+    }
+
+    .form-group label {
+        font-size: 15px;
+    }
+
+    .form-group textarea {
+        font-size: 15px;
+    }
+
+    .avatar-selection {
+        gap: 12px;
+    }
+
+    .avatar-option {
+        width: 90px;
+        height: 160px;
+    }
+
+    .submit-btn {
+        padding: 11px 25px;
+        font-size: 15px;
+    }
+
+    .back-btn {
+        bottom: 20px;
+        right: 20px;
+        padding: 10px 22px;
+        font-size: 15px;
+    }
+}
+
+/* 確保在各種螢幕尺寸下的背景漸層效果 */
+@media screen and (max-width: 1024px) {
+    body.warrior,
+    body.mage,
+    body.assassin,
+    body.craftsman,
+    body.traveler {
+        background-attachment: fixed;
+        background-size: 200% 200%;
+    }
+
+    .edit-form {
+        backdrop-filter: blur(5px);
+        -webkit-backdrop-filter: blur(5px);
+    }
+
+    /* 優化觸控操作 */
+    .avatar-option {
+        transition: transform 0.2s ease;
+    }
+
+    .avatar-option:active {
+        transform: scale(0.95);
+    }
+
+    .submit-btn:active,
+    .back-btn:active {
+        transform: scale(0.95);
+    }
+
+    /* 改善表單元素的可讀性 */
+    .form-group textarea {
+        line-height: 1.4;
+    }
+
+    /* 優化按鈕的觸控區域 */
+    .submit-btn,
+    .back-btn {
+        min-height: 44px;
+        touch-action: manipulation;
+    }
+}
+        
     </style>
 </head>
 <body>
