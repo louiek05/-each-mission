@@ -205,6 +205,48 @@ h1::after {
     margin: 20px 0;
 }
 
+            .like-container {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 5px 10px;
+    border-radius: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    z-index: 2;
+}
+
+.like-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    font-size: 1.2em;
+    color: #8B4513;
+    transition: all 0.3s ease;
+}
+
+.like-btn:hover {
+    transform: scale(1.1);
+}
+
+.like-btn.liked {
+    color: #FF69B4;
+}
+
+.like-count {
+    color: #8B4513;
+    font-size: 0.9em;
+    font-weight: bold;
+    min-width: 20px;
+    text-align: center;
+}
+
 @keyframes pulse {
     0% { opacity: 0.6; }
     50% { opacity: 1; }
@@ -385,6 +427,20 @@ h1::after {
         width: 15px;
         height: 15px;
         border-width: 2px;
+    }
+
+    like-container {
+        bottom: 5px;
+        right: 5px;
+        padding: 3px 8px;
+    }
+
+    .like-btn {
+        font-size: 1em;
+    }
+
+    .like-count {
+        font-size: 0.8em;
     }
 }
 
@@ -623,6 +679,62 @@ function createMissionCard(missionId, mission) {
         
         statusHtml = `<div class="mission-status ${statusClass}">${statusText}</div>`;
     }
+
+    // 阻止點讚按鈕的點擊事件冒泡
+    const handleLikeClick = async (e) => {
+        e.stopPropagation(); // 防止觸發卡片的點擊事件
+        if (!userId) {
+            alert('請先登入再點讚');
+            return;
+        }
+        
+        try {
+            const likeBtn = e.currentTarget;
+            const likeCountElement = likeBtn.nextElementSibling;
+            const isLiked = likeBtn.classList.contains('liked');
+            
+            // 更新 Firestore 中的點讚數據
+            const db = firebase.firestore();
+            const missionRef = db.collection('missions').doc(missionId);
+            
+            await db.runTransaction(async (transaction) => {
+                const missionDoc = await transaction.get(missionRef);
+                if (!missionDoc.exists) {
+                    throw "Mission does not exist!";
+                }
+                
+                const missionData = missionDoc.data();
+                const likes = missionData.likes || {};
+                let likeCount = missionData.likeCount || 0;
+                
+                if (isLiked) {
+                    // 取消點讚
+                    delete likes[userId];
+                    likeCount = Math.max(0, likeCount - 1);
+                    likeBtn.classList.remove('liked');
+                    likeBtn.innerHTML = '♡';
+                } else {
+                    // 添加點讚
+                    likes[userId] = true;
+                     likeCount = likeCount + 1;
+                    likeBtn.classList.add('liked');
+                    likeBtn.innerHTML = '♥';
+                }
+                
+                transaction.update(missionRef, {
+                    likes: likes,
+                    likeCount: likeCount
+                });
+                
+                // 更新顯示的點讚數
+                likeCountElement.textContent = likeCount;
+            });
+            
+        } catch (error) {
+            console.error('Error updating like:', error);
+            alert('點讚失敗，請稍後再試');
+        }
+    };
     
     // 使用發布者的頭像，如果沒有則使用第一個預設頭像
     const avatarImage = mission.publisherAvatarUrl || 'images/avatar1.jpg';
@@ -659,6 +771,28 @@ function createMissionCard(missionId, mission) {
         <img src="${avatarImage}" alt="發布者頭像" class="mission-image">
     </div>
 `;
+
+    // 創建點讚容器和按鈕
+    const likeContainer = document.createElement('div');
+    likeContainer.className = 'like-container';
+    
+    const likeButton = document.createElement('button');
+    likeButton.className = 'like-btn';
+    likeButton.innerHTML = mission.likes && mission.likes[userId] ? '♥' : '♡';
+    if (mission.likes && mission.likes[userId]) {
+        likeButton.classList.add('liked');
+    }
+    likeButton.onclick = handleLikeClick;
+    
+    const likeCount = document.createElement('span');
+    likeCount.className = 'like-count';
+    likeCount.textContent = mission.likeCount || 0;
+    
+    likeContainer.appendChild(likeButton);
+    likeContainer.appendChild(likeCount);
+    
+    // 添加點讚容器到卡片
+    card.appendChild(likeContainer);
     
     return card;
 }
